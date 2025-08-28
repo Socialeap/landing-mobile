@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hello! Interactive Signature Cards</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lobster&display=swap" rel="stylesheet" />
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-image:
+                linear-gradient(to bottom right, rgba(10,20,40,0.4), rgba(5,10,20,0.6)),
+                url('https://static.wixstatic.com/media/c3283f_9dc0517f310f4bea882c9d5455f30215~mv2.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .body-no-scroll {
+            overflow: hidden;
+        }
+        /* -- Glassmorphism Style -- */
+        .glass-ui {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .header-glass {
+            background: rgba(15, 23, 42, 0.7); /* A bit darker for header */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        /* -- Flipping Card Mechanics -- */
+        .flip-card {
+            perspective: 1500px;
+            min-height: 80px;
+        }
+        .flipper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .flip-card.is-flipped .flipper {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 0.75rem; /* 12px */
+        }
+        .card-back {
+            transform: rotateY(180deg);
+        }
+        /* -- Mobile Menu -- */
+        #mobile-menu {
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(100%);
+        }
+        #mobile-menu.is-open {
+            transform: translateX(0);
+        }
+        #menu-overlay {
+            transition: opacity 0.3s ease-in-out;
+        }
+        /* -- General Styles -- */
+        .text-shadow {
+            text-shadow: 0px 2px 4px rgba(0,0,0,0.5);
+        }
+        .anchor-offset {
+            scroll-margin-top: 100px;
+        }
+        .cta-button {
+            transition: all 0.3s ease;
+        }
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(10,20,40,0.3);
+        }
+        /* -- Iframe for mobile in Wix -- */
+        /* This is for the container where you will place the final iframe */
+        .iframe-container-mobile {
+            position: relative;
+            width: 100%;
+            height: 0;
+            padding-bottom: 177.78%; /* For a 9:16 aspect ratio */
+        }
+        .iframe-container-mobile iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-900 text-white">
+    <header id="page-header" class="header-glass sticky top-0 z-40">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <img src="https://static.wixstatic.com/media/c3283f_a292a969bd1e4d73bfc33539d64b5dd9~mv2.png" alt="Hello! Logo" class="h-16 -ml-3">
+            <button id="hamburger-btn" class="p-2 z-50 md:hidden" aria-label="Open menu">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+            </button>
+            <nav class="hidden md:flex items-center space-x-6">
+                 <a href="#features" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Features</a>
+                 <a href="#optimization" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Optimization</a>
+                 <a href="#use-cases" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Use Cases</a>
+                 <a href="#pricing" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Pricing</a>
+                 <a href="#roadmap" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Road Map</a>
+            </nav>
+        </div>
+    </header>
+
+    <div id="menu-overlay" class="fixed inset-0 bg-black/60 z-40 opacity-0 pointer-events-none md:hidden"></div>
+    <nav id="mobile-menu" class="glass-ui fixed top-0 right-0 h-full w-64 pt-24 p-6 z-50 md:hidden">
+        <div class="flex flex-col space-y-6">
+            <a href="#features" class="nav-link text-lg font-semibold text-gray-200 hover:text-sky-300">Features</a>
+            <a href="#optimization" class="nav-link text-lg font-semibold text-gray-200 hover:text-sky-300">Optimization</a>
+            <a href="#use-cases" class="nav-link text-lg font-semibold text-gray-200 hover:text-sky-300">Use Cases</a>
+            <a href="#pricing" class="nav-link text-lg font-semibold text-gray-200 hover:text-sky-300">Pricing</a>
+            <a href="#roadmap" class="nav-link text-lg font-semibold text-gray-200 hover:text-sky-300">Road Map</a>
+            <a href="https://www.socialeap.net/hello-tips" target="_blank" rel="noopener" class="nav-link text-lg font-semibold text-gray-200 hover:text-sky-300">Tips</a>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-12 sm:py-16">
+        <section id="hero" class="text-center max-w-4xl mx-auto">
+             <h1 class="text-4xl sm:text-6xl font-extrabold leading-tight tracking-tight text-shadow">
+                 <span class="block">Transform Every Introduction</span>
+                 <span class="block text-sky-300">Into an Interactive Connection.</span>
+             </h1>
+             <p class="mt-6 text-base sm:text-xl text-blue-100/90 max-w-3xl mx-auto text-shadow">
+                 Build dynamic, professional Signature Cards that amplify your brand, drive engagement, and make every interaction count.
+             </p>
+             <div class="mt-10">
+                 <button class="cta-button bg-sky-600/50 hover:bg-sky-500/70 border border-sky-400 text-white font-semibold py-3 px-8 rounded-lg text-lg">
+                     Join the Waiting List
+                 </button>
+             </div>
+        </section>
+
+        <section class="mt-24 sm:mt-32 text-center">
+            <div class="max-w-4xl mx-auto rounded-lg overflow-hidden shadow-2xl border border-white/10">
+                <div class="relative w-full h-0 pb-[56.25%]">
+                     <iframe src="https://view.genial.ly/687036af140aa8640ee8f2c5" class="absolute top-0 left-0 w-full h-full" frameborder="0" allow="autoplay; fullscreen" allowfullscreen="true" title="Hello! Interactive Email Signature Cards"></iframe>
+                </div>
+            </div>
+        </section>
+
+        <div class="space-y-20 mt-24 sm:mt-32">
+            <section id="features" class="anchor-offset">
+                <h2 class="text-3xl sm:text-4xl font-bold text-center mb-8 text-shadow">Easily Create Perfect Signatures</h2>
+                <div class="space-y-4 max-w-3xl mx-auto">
+                    <div class="flip-card" tabindex="0">
+                        <div class="flipper">
+                            <div class="card-front glass-ui p-5 flex justify-between items-center cursor-pointer">
+                                <h3 class="text-lg font-bold text-sky-400">Intuitive Signature Builder</h3>
+                                <span class="text-2xl text-sky-400/70">+</span>
+                            </div>
+                            <div class="card-back glass-ui p-5">
+                                <p class="text-gray-200">Our user-friendly builder provides a real-time preview as you craft the perfect signature, making the design process a breeze.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flip-card" tabindex="0">
+                        <div class="flipper">
+                            <div class="card-front glass-ui p-5 flex justify-between items-center cursor-pointer">
+                                <h3 class="text-lg font-bold text-sky-400">Deep Customization</h3>
+                                <span class="text-2xl text-sky-400/70">+</span>
+                            </div>
+                            <div class="card-back glass-ui p-5">
+                                <p class="text-gray-200">Control every detail, from brand colors and fonts to logos, social icons, and custom call-to-action buttons.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flip-card" tabindex="0">
+                        <div class="flipper">
+                            <div class="card-front glass-ui p-5 flex justify-between items-center cursor-pointer">
+                                <h3 class="text-lg font-bold text-sky-400">Multiple Signature Management</h3>
+                                <span class="text-2xl text-sky-400/70">+</span>
+                            </div>
+                            <div class="card-back glass-ui p-5">
+                                <p class="text-gray-200">Easily create, manage, and switch between multiple signatures for different roles or campaigns from a single dashboard.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flip-card" tabindex="0">
+                        <div class="flipper">
+                            <div class="card-front glass-ui p-5 flex justify-between items-center cursor-pointer">
+                                <h3 class="text-lg font-bold text-sky-400">Guaranteed Compatibility</h3>
+                                <span class="text-2xl text-sky-400/70">+</span>
+                            </div>
+                            <div class="card-back glass-ui p-5">
+                                <p class="text-gray-200">Signatures are built to be compatible and responsive, ensuring they look perfect in Gmail, Outlook, Apple Mail, and more.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flip-card" tabindex="0">
+                        <div class="flipper">
+                            <div class="card-front glass-ui p-5 flex justify-between items-center cursor-pointer">
+                                <h3 class="text-lg font-bold text-sky-400">AI Supported Customization</h3>
+                                <span class="text-2xl text-sky-400/70">+</span>
+                            </div>
+                            <div class="card-back glass-ui p-5">
+                                <p class="text-gray-200">Go beyond standard templates with help from our GPT design assistant. Just ask. Our GPT is context-aware to help design signatures that perfectly match your brand.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="optimization" class="anchor-offset">
+                 <h2 class="text-3xl sm:text-4xl font-bold text-center mb-8 text-shadow"><span class="block">Built for Discovery</span> <span class="block text-sky-300">AI & SEO Optimized</span></h2>
+                 <div class="space-y-4 max-w-3xl mx-auto">
+                    <div class="flip-card" tabindex="0">
+                        <div class="flipper" style="min-height: 180px;">
+                            <div class="card-front glass-ui p-5 flex justify-between items-center cursor-pointer">
+                                <h3 class="text-lg font-bold text-sky-400">For Search Engines (SEO)</h3>
+                                <span class="text-2xl text-sky-400/70">+</span>
+                            </div>
+                            <div class="card-back glass-ui p-5">
+                                <ul class="space-y-2 text-gray-200">
+                                    <li class="flex items-start">✓<span class="ml-2">Unique URLs for every signature card</span></li>
+                                    <li class="flex items-start">✓<span class="ml-2">Dynamic meta titles & rich descriptions</span></li>
+                                    <li class="flex items-start">✓<span class="ml-2">Enhanced JSON-LD Person schema</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flip-card" tabindex="0">
+                        <div class="flipper" style="min-height: 180px;">
+                            <div class="card-front glass-ui p-5 flex justify-between items-center cursor-pointer">
+                                <h3 class="text-lg font-bold text-sky-400">For AI Models</h3>
+                                <span class="text-2xl text-sky-400/70">+</span>
+                            </div>
+                            <div class="card-back glass-ui p-5">
+                                <ul class="space-y-2 text-gray-200">
+                                    <li class="flex items-start">✓<span class="ml-2">AI-friendly FAQ schemas</span></li>
+                                    <li class="flex items-start">✓<span class="ml-2">Structured Q&amp;A for direct answers</span></li>
+                                    <li class="flex items-start">✓<span class="ml-2">Semantic HTML for better understanding</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                 </div>
+            </section>
+
+            <section id="use-cases" class="anchor-offset">
+                <h2 class="text-3xl sm:text-4xl font-bold text-center mb-8 text-shadow">One Signature, Countless Applications</h2>
+                 <div class="max-w-3xl mx-auto glass-ui rounded-lg p-6 text-center">
+                    <img src="https://static.wixstatic.com/media/c3283f_4e87e2632190447fb5eb7d608c0783cf~mv2.png" alt="Example of a shareable Hello signature card" class="rounded-lg shadow-lg mx-auto w-full max-w-xs mb-4">
+                    <h3 class="text-2xl font-bold mb-2">Designed to be Shared</h3>
+                    <p class="text-blue-100/90">Your Hello! Signature Card isn't just a compact profile. It's designed for posting and embedding everywhere, from email clients and LinkedIn profiles to blog bios and digital resumes.</p>
+                 </div>
+            </section>
+            
+            <section id="pricing" class="anchor-offset">
+                <h2 class="text-3xl sm:text-4xl font-bold text-center mb-8 text-shadow">Start Here... Get your Brand Anywhere</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                    <div class="glass-ui p-6 rounded-xl flex flex-col text-center h-full border-2 border-sky-500/50">
+                        <h3 class="text-2xl font-bold text-sky-400">Design your Card</h3>
+                        <p class="text-4xl font-extrabold text-sky-300 my-6">$0.00</p>
+                        <p class="text-gray-300 font-bold mb-6">Free, Forever</p>
+                        <ul class="text-left space-y-3 text-gray-200 flex-grow">
+                            <li class="flex items-center">✓<span class="ml-2">Easy-to-use Builder</span></li>
+                            <li class="flex items-center">✓<span class="ml-2">Profile & Background Image</span></li>
+                            <li class="flex items-center">✓<span class="ml-2">Custom Button Links</span></li>
+                            <li class="flex items-center">✓<span class="ml-2">Social Media Icons</span></li>
+                        </ul>
+                        <button class="cta-button mt-8 w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 rounded-lg">Join Waiting List</button>
+                    </div>
+                    <div class="glass-ui p-6 rounded-xl flex flex-col text-center h-full border-2 border-sky-500/50">
+                        <h3 class="text-2xl font-bold text-sky-400">Publisher Pack</h3>
+                        <p class="text-4xl font-extrabold text-sky-300 my-6">$4.99</p>
+                        <p class="text-gray-300 font-bold mb-6">One-Time Payment</p>
+                        <ul class="text-left space-y-3 text-gray-200 flex-grow">
+                            <li class="flex items-center">✓<span class="ml-2">3 Publishing Slots</span></li>
+                            <li class="flex items-center">✓<span class="ml-2">Embeds for Content</span></li>
+                            <li class="flex items-center">✓<span class="ml-2">Shareable Card Links</span></li>
+                            <li class="flex items-center">✓<span class="ml-2">Earn Credits & Rewards</span></li>
+                        </ul>
+                        <button class="cta-button mt-8 w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 rounded-lg">Join Waiting List</button>
+                    </div>
+                    <div class="glass-ui p-6 rounded-xl flex flex-col text-center h-full border-2 border-indigo-500 relative">
+                        <span class="absolute top-0 -mt-3 left-1/2 -translate-x-1/2 bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-full">PRO</span>
+                        <h3 class="text-2xl font-bold text-indigo-400">Pro Plan</h3>
+                        <p class="text-4xl font-extrabold text-indigo-300 my-6">$3.99<span class="text-lg font-medium">/mo</span></p>
+                        <p class="text-gray-300 font-bold mb-6">Billed Annually</p>
+                        <ul class="text-left space-y-3 text-gray-200 flex-grow">
+                            <li class="flex items-center">✓<span class="ml-2">Views & Activity Stats</span></li>
+                            <li class="flex items-center">✓<span class="ml-2">Social Share Menu</span></li>
+                            <li class="flex items-center">✓<span class="ml-2">Add a Social Poll</span></li>
+                            <li class="flex items-center">✓<span class="ml-2">Google Maps Locator</span></li>
+                        </ul>
+                        <button class="cta-button mt-8 w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg">Join Waiting List</button>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="roadmap" class="anchor-offset">
+                <h2 class="text-3xl sm:text-4xl font-bold text-center mb-8 text-shadow">Hello! Road Map</h2>
+                <div class="space-y-4 max-w-3xl mx-auto">
+                    <div class="flip-card" tabindex="0">
+                        <div class="flipper">
+                            <div class="card-front glass-ui p-5 flex justify-between items-center cursor-pointer">
+                                <h3 class="text-lg font-semibold text-green-300">Basic Email Signature Builder <span class="text-sm text-green-300/70">(Mar '25)</span></h3>
+                                <span class="text-2xl text-green-300/70">+</span>
+                            </div>
+                            <div class="card-back glass-ui p-5">
+                                <p class="text-blue-100">Craft clean, compatible signatures for Gmail and Outlook. Copy-paste ready with live preview.</p>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="flip-card" tabindex="0">
+                        <div class="flipper">
+                            <div class="card-front glass-ui p-5 flex justify-between items-center cursor-pointer">
+                                <h3 class="text-lg font-semibold text-green-300">Dynamic Signature Builder <span class="text-sm text-green-300/70">(May '25)</span></h3>
+                                <span class="text-2xl text-green-300/70">+</span>
+                            </div>
+                            <div class="card-back glass-ui p-5">
+                                <p class="text-blue-100">Publish a live, shareable signature page with public viewing links.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flip-card" tabindex="0">
+                        <div class="flipper">
+                            <div class="card-front glass-ui p-5 flex justify-between items-center cursor-pointer">
+                                <h3 class="text-lg font-semibold text-green-300">Hello! Teams Platform <span class="text-sm text-green-300/70">(Feb '26)</span></h3>
+                                <span class="text-2xl text-green-300/70">+</span>
+                            </div>
+                            <div class="card-back glass-ui p-5">
+                                <p class="text-blue-100">Centralized admin dashboard for companies to manage employee signatures and enforce brand consistency.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="text-center py-10">
+        <p class="text-sm text-gray-400">&copy; 2025 Hello! Signature Cards. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Hamburger Menu Logic ---
+            const hamburgerBtn = document.getElementById('hamburger-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuOverlay = document.getElementById('menu-overlay');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            function toggleMenu() {
+                const isOpen = mobileMenu.classList.contains('is-open');
+                mobileMenu.classList.toggle('is-open');
+                
+                if (!isOpen) {
+                    menuOverlay.classList.remove('pointer-events-none');
+                    menuOverlay.classList.add('opacity-100');
+                    document.body.classList.add('body-no-scroll');
+                } else {
+                    menuOverlay.classList.add('pointer-events-none');
+                    menuOverlay.classList.remove('opacity-100');
+                    document.body.classList.remove('body-no-scroll');
+                }
+            }
+
+            hamburgerBtn.addEventListener('click', toggleMenu);
+            menuOverlay.addEventListener('click', toggleMenu);
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (mobileMenu.classList.contains('is-open')) {
+                        toggleMenu();
+                    }
+                });
+            });
+
+            // --- Flipping Card Logic ---
+            const flipCards = document.querySelectorAll('.flip-card');
+            
+            flipCards.forEach(card => {
+                const flipAction = () => {
+                    // Check if this card is already flipped
+                    const isFlipped = card.classList.contains('is-flipped');
+                    
+                    // Close all other cards
+                    flipCards.forEach(otherCard => {
+                        otherCard.classList.remove('is-flipped');
+                        // Reset content height for smooth transition when re-opening
+                        const flipper = otherCard.querySelector('.flipper');
+                        const back = otherCard.querySelector('.card-back');
+                        flipper.style.minHeight = '80px';
+                    });
+                    
+                    // If the card was not already flipped, flip it now
+                    if (!isFlipped) {
+                        card.classList.add('is-flipped');
+                        // Adjust the height of the flipper to match the back content
+                        const flipper = card.querySelector('.flipper');
+                        const back = card.querySelector('.card-back');
+                        // Use scrollHeight to get the full content height
+                        const backHeight = back.scrollHeight > 80 ? back.scrollHeight + 40 : 80;
+                        flipper.style.minHeight = `${backHeight}px`;
+                    }
+                };
+
+                card.addEventListener('click', flipAction);
+                card.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        flipAction();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
