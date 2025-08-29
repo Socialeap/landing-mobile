@@ -9,7 +9,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lobster&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
     <style>
         html {
@@ -27,12 +27,14 @@
         .body-no-scroll {
             overflow: hidden;
         }
-        /* -- Glassmorphism Style -- */
-        .glass-ui {
-            background: rgba(255, 255, 255, 0.08);
+        
+        /* --- Modern Glassmorphism & UI Styles --- */
+        .glass-card, .glass-card-pro, .colored-panel, .modal-panel {
+            background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
         }
         .header-glass {
             background: rgba(15, 23, 42, 0.7);
@@ -40,7 +42,17 @@
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        /* -- Flipping Card Mechanics -- */
+        .glass-card-pro { background: rgba(107, 51, 255, 0.1); border-color: rgba(129, 140, 248, 0.25); }
+        .colored-panel {
+            background: rgba(46, 26, 104, 0.2);
+            border: 1px solid rgba(129, 140, 248, 0.25);
+        }
+        .pricing-card {
+            background: rgba(20, 83, 100, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        /* --- Flipping Card Mechanics --- */
         .flip-card {
             perspective: 1500px;
         }
@@ -49,14 +61,12 @@
             width: 100%;
             height: 100%;
             transform-style: preserve-3d;
-            /* UPDATED: Added min-height to the transition for smooth animation */
             transition: transform 0.6s, min-height 0.4s ease-in-out;
         }
         .flip-card.is-flipped .flipper {
             transform: rotateY(180deg);
         }
         .card-front, .card-back {
-            position: absolute;
             width: 100%;
             height: 100%;
             -webkit-backface-visibility: hidden;
@@ -65,8 +75,11 @@
         }
         .card-back {
             transform: rotateY(180deg);
+            position: absolute;
+            top: 0;
         }
-        /* -- Mobile Menu -- */
+
+        /* --- Mobile Menu --- */
         #mobile-menu {
             transition: transform 0.3s ease-in-out;
             transform: translateX(100%);
@@ -77,36 +90,111 @@
         #menu-overlay {
             transition: opacity 0.3s ease-in-out;
         }
-        /* -- General Styles -- */
-        .text-shadow {
-            text-shadow: 0px 2px 4px rgba(0,0,0,0.5);
+        
+        /* --- General & Utility Styles --- */
+        .text-shadow { text-shadow: 0px 2px 4px rgba(0,0,0,0.5); }
+        .anchor-offset { scroll-margin-top: 100px; }
+        .cta-button { transition: all 0.3s ease; }
+        .cta-button:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(10,20,40,0.3); }
+        .modal-panel { background: rgba(23, 33, 62, 0.6); border: 1px solid rgba(129, 140, 248, 0.35); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* --- Roadmap Timeline (Mobile friendly) --- */
+        .timeline-container {
+            position: relative;
+            max-width: 1000px;
+            margin: 0 auto;
         }
-        .anchor-offset {
-            scroll-margin-top: 100px;
+        .timeline-container::after {
+            content: '';
+            position: absolute;
+            width: 3px;
+            background-color: rgba(129, 140, 248, 0.25);
+            top: 0;
+            bottom: 0;
+            left: 20px;
+            margin-left: -1.5px;
+            border-radius: 3px;
+        }
+        .timeline-item {
+            padding-left: 55px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            left: 8px;
+            background: linear-gradient(to bottom right, #818cf8, #60a5fa);
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            top: 50%;
+            transform: translateY(-50%);
+            border-radius: 50%;
+            z-index: 10;
+        }
+
+        /* --- Jotform Modal --- */
+        #jotform-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; z-index: 50; overflow: auto; -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
+        #jotform-panel { position: absolute; left: 50%; transform: translateX(-50%); border-radius: 1rem; box-shadow: 0 25px 60px rgba(0,0,0,0.45); width: min(880px, 94vw); }
+        #jotform-panel .frame-wrap { max-height: calc(100vh - 64px); }
+
+        /* --- Back-to-Top Button --- */
+        #back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 40;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(41, 154, 212, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        #back-to-top.visible {
+            display: flex;
+        }
+        #back-to-top:hover {
+            background: rgba(41, 154, 212, 0.7);
+            transform: scale(1.1);
         }
     </style>
 </head>
 
 <body class="bg-slate-900 text-white">
     <header id="page-header" class="header-glass sticky top-0 z-40">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <img src="https://static.wixstatic.com/media/c3283f_a292a969bd1e4d73bfc33539d64b5dd9~mv2.png" alt="Hello! Logo" class="h-16 -ml-3">
+        <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
+             <div class="flex items-center gap-3">
+                <div class="flex flex-col">
+                    <img src="https://static.wixstatic.com/media/c3283f_a292a969bd1e4d73bfc33539d64b5dd9~mv2.png" alt="Hello! Logo" class="h-20 -ml-4">
+                    <span class="font-medium text-sky-300/90 text-xs italic -mt-2">...More than just a greeting.</span>
+                </div>
+            </div>
             <button id="hamburger-btn" class="p-2 z-50 md:hidden" aria-label="Open menu">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
             </button>
-            <nav class="hidden md:flex items-center space-x-6">
-                 <a href="#features" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Features</a>
-                 <a href="#optimization" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Optimization</a>
-                 <a href="#use-cases" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Use Cases</a>
-                 <a href="#pricing" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Pricing</a>
-                 <a href="#roadmap" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Road Map</a>
-                 <a href="https://www.socialeap.net/hello-tips" target="_blank" rel="noopener" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Tips</a>
-            </nav>
-        </div>
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="#features" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Features</a>
+                <a href="#optimization" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Optimization</a>
+                <a href="#use-cases" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Use Cases</a>
+                <a href="#pricing" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Pricing</a>
+                <a href="#roadmap" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Road Map</a>
+                <a href="https://www.socialeap.net/hello-tips" target="_blank" rel="noopener" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Tips</a>
+            </div>
+        </nav>
     </header>
 
     <div id="menu-overlay" class="fixed inset-0 bg-black/60 z-40 opacity-0 pointer-events-none md:hidden"></div>
-    <nav id="mobile-menu" class="glass-ui fixed top-0 right-0 h-full w-64 pt-24 p-6 z-50 md:hidden">
+    <nav id="mobile-menu" class="glass-card fixed top-0 right-0 h-full w-64 pt-24 p-6 z-50 md:hidden">
         <div class="flex flex-col space-y-6">
             <a href="#features" class="nav-link text-lg font-semibold text-gray-200 hover:text-sky-300">Features</a>
             <a href="#optimization" class="nav-link text-lg font-semibold text-gray-200 hover:text-sky-300">Optimization</a>
@@ -120,442 +208,138 @@
     <main class="container mx-auto px-4 py-12 sm:py-16">
         <section id="hero" class="text-center max-w-4xl mx-auto">
              <h1 class="text-4xl sm:text-6xl font-extrabold leading-tight tracking-tight text-shadow">
-                 <span class="block">Transform Every Introduction</span>
-                 <span class="block text-sky-300">Into an Interactive Connection.</span>
+                <span class="block">Transform Every Introduction</span>
+                <span class="block text-sky-300">Into an Interactive Connection.</span>
              </h1>
              <p class="mt-6 text-base sm:text-xl text-blue-100/90 max-w-3xl mx-auto text-shadow">
-                 Build dynamic, professional Signature Cards that amplify your brand, drive engagement, and make every interaction count.
+                Build dynamic, professional Signature Cards that amplify your brand, drive engagement, and make every interaction count.
              </p>
              <div class="mt-10">
-                 <button class="cta-button bg-sky-600/50 hover:bg-sky-500/70 border border-sky-400 text-white font-semibold py-3 px-8 rounded-lg text-lg">
-                     Join the Waiting List
-                 </button>
+                <button class="js-open-modal cta-button bg-sky-600/50 hover:bg-sky-500/70 border border-sky-400 text-white font-semibold py-3 px-8 rounded-lg text-lg">
+                    Join the Waiting List
+                </button>
              </div>
         </section>
 
         <section class="mt-24 sm:mt-32 text-center">
-            <div class="max-w-sm mx-auto rounded-2xl overflow-hidden shadow-2xl border-2 border-white/10 p-2 glass-ui">
-                <div class="relative w-full h-0 pb-[177.78%] rounded-lg overflow-hidden">
-                     <iframe 
-                         src="https://view.genially.com/68897f93b9cce9fd1a7cb2b5" 
-                         class="absolute top-0 left-0 w-full h-full" 
-                         frameborder="0" 
-                         allow="autoplay; fullscreen" 
-                         allowfullscreen="true" 
-                         title="Hello! Interactive Email Signature Cards">
-                     </iframe>
+            <div class="max-w-4xl mx-auto rounded-lg overflow-hidden">
+                <div class="relative w-full h-0 pb-[56.25%]">
+                     <iframe
+                        src="https://view.genial.ly/687036af140aa8640ee8f2c5"
+                        class="absolute top-0 left-0 w-full h-full"
+                        frameborder="0"
+                        allow="autoplay; fullscreen"
+                        allowfullscreen="true"
+                        title="Hello! Interactive Email Signature Cards">
+                    </iframe>
                 </div>
             </div>
+             <div class="mt-8">
+                <button class="js-open-modal cta-button bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 px-8 rounded-lg text-base sm:text-lg">
+                    Join the Waiting List
+                </button>
+            </div>
         </section>
-
+        
         <div class="space-y-20 mt-24 sm:mt-32">
             <section id="features" class="anchor-offset">
                 <h2 class="text-3xl sm:text-4xl font-bold text-center mb-8 text-shadow">Easily Create Perfect Signatures</h2>
                 <div class="space-y-4 max-w-3xl mx-auto">
-                    <div class="flip-card" tabindex="0">
-                        <div class="flipper">
-                            <div class="card-front glass-ui px-5 h-24 flex items-center justify-between cursor-pointer">
-                                <div class="flex items-center gap-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                                    <h3 class="text-lg font-bold text-green-400">Intuitive Signature Builder</h3>
-                                </div>
-                                <span class="text-2xl text-green-400/70">+</span>
-                            </div>
-                            <div class="card-back glass-ui p-5 flex items-center">
-                                <p class="text-gray-200">Our user-friendly builder provides a real-time preview as you craft the perfect signature, making the design process a breeze.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flip-card" tabindex="0">
-                        <div class="flipper">
-                            <div class="card-front glass-ui px-5 h-24 flex items-center justify-between cursor-pointer">
-                                <div class="flex items-center gap-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                    <h3 class="text-lg font-bold text-green-400">Deep Customization</h3>
-                                </div>
-                                <span class="text-2xl text-green-400/70">+</span>
-                            </div>
-                            <div class="card-back glass-ui p-5 flex items-center">
-                                <p class="text-gray-200">Control every detail, from brand colors and fonts to logos, social icons, and custom call-to-action buttons.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flip-card" tabindex="0">
-                        <div class="flipper">
-                            <div class="card-front glass-ui px-5 h-24 flex items-center justify-between cursor-pointer">
-                                <div class="flex items-center gap-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                                    <h3 class="text-lg font-bold text-green-400">Multiple Signature Management</h3>
-                                </div>
-                                <span class="text-2xl text-green-400/70">+</span>
-                            </div>
-                            <div class="card-back glass-ui p-5 flex items-center">
-                                <p class="text-gray-200">Easily create, manage, and switch between multiple signatures for different roles or campaigns from a single dashboard.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flip-card" tabindex="0">
-                        <div class="flipper">
-                            <div class="card-front glass-ui px-5 h-24 flex items-center justify-between cursor-pointer">
-                                <div class="flex items-center gap-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0l5-5 5 5m-10 0v2m10-2v2" /></svg>
-                                    <h3 class="text-lg font-bold text-green-400">One-Click Copy & Paste</h3>
-                                </div>
-                                <span class="text-2xl text-green-400/70">+</span>
-                            </div>
-                            <div class="card-back glass-ui p-5 flex items-center">
-                                <p class="text-gray-200">Our secure copy process ensures your signature pastes perfectly into any email client, avoiding broken formatting issues.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flip-card" tabindex="0">
-                        <div class="flipper">
-                            <div class="card-front glass-ui px-5 h-24 flex items-center justify-between cursor-pointer">
-                                <div class="flex items-center gap-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-                                    <h3 class="text-lg font-bold text-green-400">Guaranteed Compatibility</h3>
-                                </div>
-                                <span class="text-2xl text-green-400/70">+</span>
-                            </div>
-                            <div class="card-back glass-ui p-5 flex items-center">
-                                <p class="text-gray-200">Signatures are built to be compatible and responsive, ensuring they look perfect in Gmail, Outlook, Apple Mail, and more.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flip-card" tabindex="0">
-                        <div class="flipper">
-                            <div class="card-front glass-ui px-5 h-24 flex items-center justify-between cursor-pointer">
-                                <div class="flex items-center gap-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path></svg>
-                                    <h3 class="text-lg font-bold text-green-400">Mini-Game Challenges</h3>
-                                </div>
-                                <span class="text-2xl text-green-400/70">+</span>
-                            </div>
-                            <div class="card-back glass-ui p-5 flex items-center">
-                                <p class="text-gray-200">Test your mental acuity with fun, built-in games inside the app. Compete with others and win credits and rewards!</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flip-card" tabindex="0">
-                        <div class="flipper">
-                            <div class="card-front glass-ui px-5 h-24 flex items-center justify-between cursor-pointer">
-                                <div class="flex items-center gap-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
-                                    <h3 class="text-lg font-bold text-green-400">AI Supported Customization</h3>
-                                </div>
-                                <span class="text-2xl text-green-400/70">+</span>
-                            </div>
-                            <div class="card-back glass-ui p-5 flex items-center">
-                                <p class="text-gray-200">Go beyond standard templates with help from our GPT design assistant. Just ask our GPT to help design signatures that match your brand.</p>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg><h3 class="text-lg font-bold text-sky-400">Intuitive Signature Builder</h3></div><span class="text-2xl text-sky-400/70 ml-4">+</span></div><div class="card-back glass-card p-5 flex items-center"><p class="text-gray-200">Our user-friendly builder provides a real-time preview as you craft the perfect signature, making the design process a breeze.</p></div></div></div>
+                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg><h3 class="text-lg font-bold text-sky-400">Deep Customization</h3></div><span class="text-2xl text-sky-400/70 ml-4">+</span></div><div class="card-back glass-card p-5 flex items-center"><p class="text-gray-200">Control every detail, from brand colors and fonts to logos, social icons, and custom call-to-action buttons.</p></div></div></div>
+                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0l5-5 5 5m-10 0v2m10-2v2" /></svg><h3 class="text-lg font-bold text-sky-400">Multiple Signature Management</h3></div><span class="text-2xl text-sky-400/70 ml-4">+</span></div><div class="card-back glass-card p-5 flex items-center"><p class="text-gray-200">Easily create, manage, and switch between multiple signatures for different roles or campaigns from a single dashboard.</p></div></div></div>
+                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg><h3 class="text-lg font-bold text-sky-400">One-Click Copy & Paste</h3></div><span class="text-2xl text-sky-400/70 ml-4">+</span></div><div class="card-back glass-card p-5 flex items-center"><p class="text-gray-200">Our secure copy process ensures your signature pastes perfectly into any email client, avoiding broken formatting issues.</p></div></div></div>
+                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg><h3 class="text-lg font-bold text-sky-400">Guaranteed Compatibility</h3></div><span class="text-2xl text-sky-400/70 ml-4">+</span></div><div class="card-back glass-card p-5 flex items-center"><p class="text-gray-200">Signatures are built to be compatible and responsive, ensuring they look perfect in Gmail, Outlook, Apple Mail, and more.</p></div></div></div>
+                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/></svg><h3 class="text-lg font-bold text-sky-400">Mini-Game Challenges</h3></div><span class="text-2xl text-sky-400/70 ml-4">+</span></div><div class="card-back glass-card p-5 flex items-center"><p class="text-gray-200">Test your mental acuity with fun, built-in games inside the app. Compete with others and win credits and rewards!</p></div></div></div>
+                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg><h3 class="text-lg font-bold text-sky-400">AI Supported Customization</h3></div><span class="text-2xl text-sky-400/70 ml-4">+</span></div><div class="card-back glass-card p-5 flex items-center"><p class="text-gray-200">Go beyond standard templates with help from our GPT design assistant. Just ask. Our GPT is context-aware to help design signatures that perfectly match your brand.</p></div></div></div>
                 </div>
             </section>
             
             <section id="viewer-experience" class="anchor-offset">
                 <h2 class="text-3xl sm:text-4xl font-bold text-center mb-8 text-shadow">Easily Engage Your Audience</h2>
                 <div class="space-y-4 max-w-3xl mx-auto">
-                    <div class="flip-card" tabindex="0">
-                        <div class="flipper">
-                            <div class="card-front glass-ui px-5 h-24 flex items-center justify-between cursor-pointer border-indigo-500/50 border-2">
-                                <div class="flex items-center gap-4">
-                                    <svg class="h-6 w-6 text-indigo-400" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="4"><animate attributeName="r" from="4" to="8" dur="1.5s" begin="0s" repeatCount="indefinite"></animate><animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0s" repeatCount="indefinite"></animate></circle><circle cx="12" cy="12" r="4"></circle></svg>
-                                    <h3 class="text-lg font-bold text-indigo-400">Live Profile Sync</h3>
-                                </div>
-                                <span class="text-2xl text-indigo-400/70">+</span>
-                            </div>
-                            <div class="card-back glass-ui p-5 flex items-center border-indigo-500/50 border-2">
-                                <p class="text-gray-200">Email signatures include a '🟢 Live' icon, linking recipients to your card for the latest info and interactive features.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flip-card" tabindex="0">
-                        <div class="flipper">
-                            <div class="card-front glass-ui px-5 h-24 flex items-center justify-between cursor-pointer border-indigo-500/50 border-2">
-                                <div class="flex items-center gap-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                                    <h3 class="text-lg font-bold text-indigo-400">No Branding But Yours</h3>
-                                </div>
-                                <span class="text-2xl text-indigo-400/70">+</span>
-                            </div>
-                            <div class="card-back glass-ui p-5 flex items-center border-indigo-500/50 border-2">
-                                <p class="text-gray-200">Your signature is yours alone. We never add our own branding or "Sent with" links to your final signature card.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flip-card" tabindex="0">
-                        <div class="flipper">
-                            <div class="card-front glass-ui px-5 h-24 flex items-center justify-between cursor-pointer border-indigo-500/50 border-2">
-                                <div class="flex items-center gap-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                                    <h3 class="text-lg font-bold text-indigo-400">Viewer Engagement Stats</h3>
-                                </div>
-                                <span class="text-2xl text-indigo-400/70">+</span>
-                            </div>
-                            <div class="card-back glass-ui p-5 flex items-center border-indigo-500/50 border-2">
-                                <p class="text-gray-200">Unlock statistics to see how your audience interacts with your card, including views, clicks, and social shares.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flip-card" tabindex="0">
-                        <div class="flipper">
-                            <div class="card-front glass-ui px-5 h-24 flex items-center justify-between cursor-pointer border-indigo-500/50 border-2">
-                                <div class="flex items-center gap-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2V6a2 2 0 012-2h2.586a1 1 0 01.707.293l1.414 1.414a1 1 0 00.707.293H17z"></path></svg>
-                                    <h3 class="text-lg font-bold text-indigo-400">Interactive Polls</h3>
-                                </div>
-                                <span class="text-2xl text-indigo-400/70">+</span>
-                            </div>
-                            <div class="card-back glass-ui p-5 flex items-center border-indigo-500/50 border-2">
-                                <p class="text-gray-200">Boost engagement with survey polls and organic sharing with QR+Social Share menus.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flip-card" tabindex="0">
-                        <div class="flipper">
-                            <div class="card-front glass-ui px-5 h-24 flex items-center justify-between cursor-pointer border-indigo-500/50 border-2">
-                                <div class="flex items-center gap-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367 2.684z"></path></svg>
-                                    <h3 class="text-lg font-bold text-indigo-400">Easy Social Sharing</h3>
-                                </div>
-                                <span class="text-2xl text-indigo-400/70">+</span>
-                            </div>
-                            <div class="card-back glass-ui p-5 flex items-center border-indigo-500/50 border-2">
-                                <p class="text-gray-200">Your public signature page includes a share menu, making it simple for viewers to share your card across their networks.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flip-card" tabindex="0">
-                        <div class="flipper">
-                            <div class="card-front glass-ui px-5 h-24 flex items-center justify-between cursor-pointer border-indigo-500/50 border-2">
-                                <div class="flex items-center gap-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                                    <h3 class="text-lg font-bold text-indigo-400">Google Maps Locator</h3>
-                                </div>
-                                <span class="text-2xl text-indigo-400/70">+</span>
-                            </div>
-                            <div class="card-back glass-ui p-5 flex items-center border-indigo-500/50 border-2">
-                                <p class="text-gray-200">Add a map to your signature card, allowing viewers to easily find your business or event location.</p>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card-pro p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg class="h-6 w-6 text-green-400 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="4"><animate attributeName="r" from="4" to="8" dur="1.5s" begin="0s" repeatCount="indefinite" /><animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0s" repeatCount="indefinite" /></circle><circle cx="12" cy="12" r="4" /></svg><h3 class="text-lg font-bold text-indigo-300">Live Profile Sync</h3></div><span class="text-2xl text-indigo-300/70 ml-4">+</span></div><div class="card-back glass-card-pro p-5 flex items-center"><p class="text-gray-200">Email signatures include a '🟢 Live' icon, linking recipients to your card for the latest info and interactive features.</p></div></div></div>
+                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card-pro p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg><h3 class="text-lg font-bold text-indigo-300">No Branding But Yours</h3></div><span class="text-2xl text-indigo-300/70 ml-4">+</span></div><div class="card-back glass-card-pro p-5 flex items-center"><p class="text-gray-200">Your signature is yours alone. We never add our own branding or "Sent with" links to your final signature card.</p></div></div></div>
+                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card-pro p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg><h3 class="text-lg font-bold text-indigo-300">Viewer Engagement Stats<sup class="text-indigo-400">*</sup></h3></div><span class="text-2xl text-indigo-300/70 ml-4">+</span></div><div class="card-back glass-card-pro p-5 flex items-center"><p class="text-gray-200">Unlock statistics to see how your audience interacts with your card, including views, clicks, and social shares.</p></div></div></div>
+                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card-pro p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2V6a2 2 0 012-2h2.586a1 1 0 01.707.293l1.414 1.414a1 1 0 00.707.293H17z" /></svg><h3 class="text-lg font-bold text-indigo-300">Interactive Polls<sup class="text-indigo-400">*</sup></h3></div><span class="text-2xl text-indigo-300/70 ml-4">+</span></div><div class="card-back glass-card-pro p-5 flex items-center"><p class="text-gray-200">Boost engagement with survey polls and organic sharing with QR+Social Share menus.</p></div></div></div>
+                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card-pro p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367 2.684z" /></svg><h3 class="text-lg font-bold text-indigo-300">Easy Social Sharing<sup class="text-indigo-400">*</sup></h3></div><span class="text-2xl text-indigo-300/70 ml-4">+</span></div><div class="card-back glass-card-pro p-5 flex items-center"><p class="text-gray-200">Your public signature page includes a share menu, making it simple for viewers to share your card across their networks.</p></div></div></div>
+                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card-pro p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg><h3 class="text-lg font-bold text-indigo-300">Google Maps Locator<sup class="text-indigo-400">*</sup></h3></div><span class="text-2xl text-indigo-300/70 ml-4">+</span></div><div class="card-back glass-card-pro p-5 flex items-center"><p class="text-gray-200">Add a map to your signature card, allowing viewers to easily find your business or event location.</p></div></div></div>
                 </div>
             </section>
             
             <section id="optimization" class="anchor-offset">
-                <h2 class="text-3xl sm:text-4xl font-bold text-center mb-8 text-shadow"><span class="block">Built for Discovery</span> <span class="block text-sky-300">AI & SEO Optimized</span></h2>
+                <h2 class="text-3xl sm:text-4xl font-bold text-center mb-4 text-shadow"><span class="block">Built for Discovery</span> <span class="block text-sky-300">AI & SEO Optimized</span></h2>
+                <p class="text-center max-w-3xl mx-auto mb-8 text-sm sm:text-lg text-blue-100/90">Your Hello! Signature Card is engineered to be found. We use advanced techniques to ensure search engines and AI models can easily discover and understand your professional expertise.</p>
                 <div class="space-y-4 max-w-3xl mx-auto">
-                    <div class="flip-card" tabindex="0">
-                        <div class="flipper">
-                            <div class="card-front glass-ui px-5 h-24 flex items-center justify-between cursor-pointer">
-                                <div class="flex items-center gap-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                                    <h3 class="text-lg font-bold text-green-400">For Search Engines (SEO)</h3>
-                                </div>
-                                <span class="text-2xl text-green-400/70">+</span>
-                            </div>
-                            <div class="card-back glass-ui p-5 flex items-center">
-                                <ul class="space-y-2 text-gray-200">
-                                    <li class="flex items-start">✓<span class="ml-2">Unique URLs for every signature card</span></li>
-                                    <li class="flex items-start">✓<span class="ml-2">Dynamic meta titles & rich descriptions</span></li>
-                                    <li class="flex items-start">✓<span class="ml-2">Enhanced JSON-LD Person schema</span></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flip-card" tabindex="0">
-                        <div class="flipper">
-                            <div class="card-front glass-ui px-5 h-24 flex items-center justify-between cursor-pointer">
-                                <div class="flex items-center gap-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6.75v1.5l-3.75 3.75v1.5m-3.75 3.75l-3.75-3.75v-1.5m11.25 0l-3.75 3.75m-3.75-3.75l3.75-3.75m-3.75 3.75h7.5m-7.5 0v7.5" /></svg>
-                                    <h3 class="text-lg font-bold text-green-400">For AI Models</h3>
-                                </div>
-                                <span class="text-2xl text-green-400/70">+</span>
-                            </div>
-                            <div class="card-back glass-ui p-5 flex items-center">
-                                <ul class="space-y-2 text-gray-200">
-                                    <li class="flex items-start">✓<span class="ml-2">AI-friendly FAQ schemas</span></li>
-                                    <li class="flex items-start">✓<span class="ml-2">Structured Q&amp;A for direct answers</span></li>
-                                    <li class="flex items-start">✓<span class="ml-2">Semantic HTML for better understanding</span></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
+                     <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg><h3 class="text-lg font-bold text-sky-400">For Search Engines (SEO)</h3></div><span class="text-2xl text-sky-400/70 ml-4">+</span></div><div class="card-back glass-card p-5 flex items-center"><ul class="space-y-2 text-gray-200"><li class="flex items-start"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>Unique URLs for every signature card</span></li><li class="flex items-start"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>Dynamic meta titles & rich descriptions</span></li><li class="flex items-start"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>Enhanced JSON-LD Person schema</span></li></ul></div></div></div>
+                     <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg><h3 class="text-lg font-bold text-sky-400">For AI Models</h3></div><span class="text-2xl text-sky-400/70 ml-4">+</span></div><div class="card-back glass-card p-5 flex items-center"><ul class="space-y-2 text-gray-200"><li class="flex items-start"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>AI-friendly FAQ schemas</span></li><li class="flex items-start"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>Structured Q&amp;A for direct answers</span></li><li class="flex items-start"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>Semantic HTML for better understanding</span></li></ul></div></div></div>
                 </div>
             </section>
             
             <section id="use-cases" class="anchor-offset">
                 <h2 class="text-3xl sm:text-4xl font-bold text-center mb-8 text-shadow">One Signature, Countless Applications</h2>
-                <div class="max-w-3xl mx-auto glass-ui rounded-lg p-6 text-center">
-                   <img src="https://static.wixstatic.com/media/c3283f_4e87e2632190447fb5eb7d608c0783cf~mv2.png" alt="Example of a shareable Hello signature card" class="rounded-lg shadow-lg mx-auto w-full max-w-xs mb-4">
-                   <h3 class="text-2xl font-bold mb-2">Designed to be Shared</h3>
-                   <p class="text-blue-100/90">Your Hello! Signature Card isn't just a compact profile. It's designed for posting and embedding everywhere, from email clients and LinkedIn profiles to blog bios and digital resumes.</p>
+                <div class="colored-panel p-6 sm:p-8 rounded-2xl shadow-lg max-w-3xl mx-auto">
+                    <img src="https://static.wixstatic.com/media/c3283f_4e87e2632190447fb5eb7d608c0783cf~mv2.png" alt="Example of a shareable Hello signature card" class="rounded-lg shadow-lg mx-auto w-full max-w-xs mb-6">
+                    <h3 class="text-2xl font-bold mb-2 text-center">Designed to be Shared</h3>
+                    <p class="text-blue-100/90 text-center text-sm sm:text-base">Your Hello! Signature Card is designed for posting and embedding into a variety of social media, document formats, and messaging apps, with a share menu to let viewers share it with their own networks.</p>
                 </div>
-                <div class="max-w-3xl mx-auto grid grid-cols-2 gap-4 text-center mt-6">
-                    <div class="glass-ui p-4 rounded-lg flex items-center justify-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg><p class="text-sm">Email Clients</p></div>
-                    <div class="glass-ui p-4 rounded-lg flex items-center justify-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"></path></svg><p class="text-sm">LinkedIn Profiles</p></div>
-                    <div class="glass-ui p-4 rounded-lg flex items-center justify-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3h9M7 16h6M7 8h6v4H7V8z"></path></svg><p class="text-sm">Blog Post Bios</p></div>
-                    <div class="glass-ui p-4 rounded-lg flex items-center justify-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg><p class="text-sm">CRM Templates</p></div>
+                <div class="max-w-3xl mx-auto grid grid-cols-2 gap-4 text-center mt-8">
+                    <div class="colored-panel p-4 rounded-lg flex items-center justify-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg><p class="text-sm">Email Clients</p></div>
+                    <div class="colored-panel p-4 rounded-lg flex items-center justify-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg><p class="text-sm">LinkedIn Profiles</p></div>
+                    <div class="colored-panel p-4 rounded-lg flex items-center justify-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3h9M7 16h6M7 8h6v4H7V8z" /></svg><p class="text-sm">Blog Post Bios</p></div>
+                    <div class="colored-panel p-4 rounded-lg flex items-center justify-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg><p class="text-sm">CRM Templates</p></div>
                 </div>
             </section>
-
+            
             <section id="pricing" class="anchor-offset">
                 <h2 class="text-3xl sm:text-4xl font-bold text-center mb-8 text-shadow">Start Here... Get your Brand Anywhere</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-                    <div class="glass-ui p-6 rounded-xl flex flex-col text-center h-full border-2 border-sky-500/50">
-                        <h3 class="text-2xl font-bold text-sky-400">Design your Card</h3>
-                        <p class="text-4xl font-extrabold text-sky-300 my-6">$0.00</p>
-                        <p class="text-gray-300 font-bold mb-6">Free, Forever</p>
-                        <ul class="text-left space-y-3 text-gray-200 flex-grow">
-                            <li class="flex items-center">✓<span class="ml-2">Easy-to-use Builder</span></li>
-                            <li class="flex items-center">✓<span class="ml-2">Profile & Background Image</span></li>
-                            <li class="flex items-center">✓<span class="ml-2">Custom Button Links</span></li>
-                            <li class="flex items-center">✓<span class="ml-2">Social Media Icons</span></li>
-                        </ul>
-                        <button class="cta-button mt-8 w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 rounded-lg">Join Waiting List</button>
-                    </div>
-                    <div class="glass-ui p-6 rounded-xl flex flex-col text-center h-full border-2 border-sky-500/50">
-                        <h3 class="text-2xl font-bold text-sky-400">Publisher Pack</h3>
-                        <p class="text-4xl font-extrabold text-sky-300 my-6">$4.99</p>
-                        <p class="text-gray-300 font-bold mb-6">One-Time Payment</p>
-                        <ul class="text-left space-y-3 text-gray-200 flex-grow">
-                            <li class="flex items-center">✓<span class="ml-2">3 Publishing Slots</span></li>
-                            <li class="flex items-center">✓<span class="ml-2">Embeds for Content</span></li>
-                            <li class="flex items-center">✓<span class="ml-2">Shareable Card Links</span></li>
-                            <li class="flex items-center">✓<span class="ml-2">Earn Credits & Rewards</span></li>
-                        </ul>
-                        <button class="cta-button mt-8 w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 rounded-lg">Join Waiting List</button>
-                    </div>
-                    <div class="glass-ui p-6 rounded-xl flex flex-col text-center h-full border-2 border-indigo-500 relative">
-                        <span class="absolute top-0 -mt-3 left-1/2 -translate-x-1/2 bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-full">PRO</span>
-                        <h3 class="text-2xl font-bold text-indigo-400">Pro Plan</h3>
-                        <p class="text-4xl font-extrabold text-indigo-300 my-6">$3.99<span class="text-lg font-medium">/mo</span></p>
-                        <p class="text-gray-300 font-bold mb-6">Billed Annually</p>
-                        <ul class="text-left space-y-3 text-gray-200 flex-grow">
-                            <li class="flex items-center">✓<span class="ml-2">Views & Activity Stats</span></li>
-                            <li class="flex items-center">✓<span class="ml-2">Social Share Menu</span></li>
-                            <li class="flex items-center">✓<span class="ml-2">Add a Social Poll</span></li>
-                            <li class="flex items-center">✓<span class="ml-2">Google Maps Locator</span></li>
-                        </ul>
-                        <button class="cta-button mt-8 w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg">Join Waiting List</button>
-                    </div>
+                    <div class="pricing-card p-6 rounded-2xl flex flex-col text-center h-full border-2 border-sky-500"><h3 class="text-2xl font-bold text-sky-400">Design your Card</h3><div class="my-6 flex-grow"><p class="text-4xl font-extrabold text-sky-300">$0.00</p><p class="text-gray-300 font-bold">Free, Forever</p></div><ul class="text-left space-y-3 text-gray-200 mb-6 text-sm"><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Easy-to-use Builder</li><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Profile & Background Image</li><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Custom Button Links</li><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Social Media Icons</li><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>.vCard Download</li></ul><button class="js-open-modal cta-button mt-auto w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 rounded-lg">Join Waiting List</button></div>
+                    <div class="pricing-card p-6 rounded-2xl flex flex-col text-center h-full border-2 border-sky-500"><h3 class="text-2xl font-bold text-sky-400">Publisher Pack</h3><div class="my-6 flex-grow"><p class="text-4xl font-extrabold text-sky-300">$4.99</p><p class="text-gray-300 font-bold">One-Time Payment</p></div><ul class="text-left space-y-3 text-gray-200 mb-6 text-sm"><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>3 Publishing Slots</li><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Embeds for Content</li><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Shareable Card Links</li><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Earn Credits & Rewards</li></ul><button class="js-open-modal cta-button mt-auto w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 rounded-lg">Join Waiting List</button></div>
+                    <div class="pricing-card p-6 rounded-2xl flex flex-col text-center h-full border-2 border-indigo-500 relative"><span class="absolute top-0 -mt-3 left-1/2 -translate-x-1/2 bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">PRO</span><h3 class="text-2xl font-bold text-indigo-400">Pro Plan</h3><div class="my-6 flex-grow"><p class="text-4xl font-extrabold text-indigo-300">$3.99<span class="text-lg font-medium text-gray-300">/mo</span></p><p class="text-gray-300 font-bold">Save 23% at $36.99/yr</p></div><ul class="text-left space-y-3 text-gray-200 mb-6 text-sm"><li class="flex items-center"><svg class="w-5 h-5 text-indigo-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Views & Activity Stats</li><li class="flex items-center"><svg class="w-5 h-5 text-indigo-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Social Share Menu</li><li class="flex items-center"><svg class="w-5 h-5 text-indigo-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Add a Social Poll</li><li class="flex items-center"><svg class="w-5 h-5 text-indigo-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Google Maps Locator</li></ul><p class="text-xs text-gray-400 mt-2">* Publisher Pack purchase required.</p><button class="js-open-modal cta-button mt-auto pt-4 w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg">Join Waiting List</button></div>
                 </div>
             </section>
             
             <section id="roadmap" class="anchor-offset">
-                <h2 class="text-3xl sm:text-4xl font-bold text-center mb-8 text-shadow">Hello! Road Map</h2>
-                <div class="space-y-4 max-w-3xl mx-auto">
-                    <div class="flip-card" tabindex="0">
-                        <div class="flipper">
-                            <div class="card-front glass-ui px-5 h-24 flex items-center justify-between cursor-pointer">
-                                <div class="flex items-center gap-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                                    <h3 class="text-lg font-semibold text-green-300">Basic Email Signature Builder <span class="text-sm text-green-300/70">(Mar '25)</span></h3>
-                                </div>
-                                <span class="text-2xl text-green-300/70">+</span>
-                            </div>
-                            <div class="card-back glass-ui p-5 flex items-center">
-                                <p class="text-blue-100">Craft clean, compatible signatures for Gmail and Outlook. Copy-paste ready with live preview.</p>
-                            </div>
-                        </div>
-                    </div>
-                     <div class="flip-card" tabindex="0">
-                        <div class="flipper">
-                            <div class="card-front glass-ui px-5 h-24 flex items-center justify-between cursor-pointer">
-                                <div class="flex items-center gap-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
-                                    <h3 class="text-lg font-semibold text-green-300">Dynamic Signature Builder <span class="text-sm text-green-300/70">(May '25)</span></h3>
-                                </div>
-                                <span class="text-2xl text-green-300/70">+</span>
-                            </div>
-                            <div class="card-back glass-ui p-5 flex items-center">
-                                <p class="text-blue-100">Publish a live, shareable signature page with public viewing links.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flip-card" tabindex="0">
-                        <div class="flipper">
-                            <div class="card-front glass-ui px-5 h-24 flex items-center justify-between cursor-pointer">
-                                <div class="flex items-center gap-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2V6a2 2 0 012-2h2.586a1 1 0 01.707.293l1.414 1.414a1 1 0 00.707.293H17z"></path></svg>
-                                    <h3 class="text-lg font-semibold text-green-300">Engagement Features <span class="text-sm text-green-300/70">(Jul '25)</span></h3>
-                                </div>
-                                <span class="text-2xl text-green-300/70">+</span>
-                            </div>
-                            <div class="card-back glass-ui p-5 flex items-center">
-                                <p class="text-blue-100">Boost engagement with survey polls and organic sharing with QR+Social Share menus.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flip-card" tabindex="0">
-                        <div class="flipper">
-                            <div class="card-front glass-ui px-5 h-24 flex items-center justify-between cursor-pointer">
-                                <div class="flex items-center gap-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                                    <h3 class="text-lg font-semibold text-green-300">Added Customization <span class="text-sm text-green-300/70">(Sep '25)</span></h3>
-                                </div>
-                                <span class="text-2xl text-green-300/70">+</span>
-                            </div>
-                            <div class="card-back glass-ui p-5 flex items-center">
-                                <p class="text-blue-100">Card themes, brand colors, and display font options for your name.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flip-card" tabindex="0">
-                        <div class="flipper">
-                            <div class="card-front glass-ui px-5 h-24 flex items-center justify-between cursor-pointer">
-                                <div class="flex items-center gap-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
-                                    <h3 class="text-lg font-semibold text-green-300">Signature Spotlights <span class="text-sm text-green-300/70">(Oct '25)</span></h3>
-                                </div>
-                                <span class="text-2xl text-green-300/70">+</span>
-                            </div>
-                            <div class="card-back glass-ui p-5 flex items-center">
-                                <p class="text-blue-100">Curated gallery highlighting standout Signature Cards from the community.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flip-card" tabindex="0">
-                        <div class="flipper">
-                            <div class="card-front glass-ui px-5 h-24 flex items-center justify-between cursor-pointer">
-                                <div class="flex items-center gap-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                                    <h3 class="text-lg font-semibold text-green-300">Directory Platform <span class="text-sm text-green-300/70">(Dec '25)</span></h3>
-                                </div>
-                                <span class="text-2xl text-green-300/70">+</span>
-                            </div>
-                            <div class="card-back glass-ui p-5 flex items-center">
-                                <p class="text-blue-100">Discover people by tags and expertise in a searchable network of Cards.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flip-card" tabindex="0">
-                        <div class="flipper">
-                            <div class="card-front glass-ui px-5 h-24 flex items-center justify-between cursor-pointer">
-                                <div class="flex items-center gap-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                                    <h3 class="text-lg font-semibold text-green-300">Hello! Teams Platform <span class="text-sm text-green-300/70">(Feb '26)</span></h3>
-                                </div>
-                                <span class="text-2xl text-green-300/70">+</span>
-                            </div>
-                            <div class="card-back glass-ui p-5 flex items-center">
-                                <p class="text-blue-100">Centralized admin dashboard for companies to manage employee signatures and enforce brand consistency.</p>
-                            </div>
-                        </div>
-                    </div>
+                <h2 class="text-3xl sm:text-4xl font-bold text-center mb-2 text-shadow">Hello! Road Map</h2>
+                <p class="text-center text-blue-100 mb-10">What’s shipping next — and when. Tap a card to learn more.</p>
+                <div class="timeline-container">
+                    <div class="timeline-item"><div class="flip-card" tabindex="0"><div class="flipper min-h-[100px]"><div class="card-front glass-card p-4 flex items-center gap-4 cursor-pointer"><div class="flex-shrink-0 text-center bg-indigo-900/50 rounded-lg p-3 w-20"><span class="text-green-300 font-bold text-xl">MAR</span><span class="block text-green-300/80 text-sm font-semibold">'25</span></div><h3 class="font-semibold text-green-200">Basic Email Signature Builder</h3></div><div class="card-back colored-panel p-4 flex flex-col justify-center text-left"><div class="p-2"><h3 class="font-bold text-green-300">Basic Email Signature Builder</h3><p class="text-sm text-blue-100 mt-2">Craft clean, compatible signatures for Gmail and Outlook. Copy-paste ready with live preview.</p></div></div></div></div></div>
+                    <div class="timeline-item"><div class="flip-card" tabindex="0"><div class="flipper min-h-[100px]"><div class="card-front glass-card p-4 flex items-center gap-4 cursor-pointer"><div class="flex-shrink-0 text-center bg-indigo-900/50 rounded-lg p-3 w-20"><span class="text-green-300 font-bold text-xl">MAY</span><span class="block text-green-300/80 text-sm font-semibold">'25</span></div><h3 class="font-semibold text-green-200">Dynamic Signature Builder</h3></div><div class="card-back colored-panel p-4 flex flex-col justify-center text-left"><div class="p-2"><h3 class="font-bold text-green-300">Dynamic Signature Builder</h3><p class="text-sm text-blue-100 mt-2">Publish a live, shareable signature page with public viewing links.</p></div></div></div></div></div>
+                    <div class="timeline-item"><div class="flip-card" tabindex="0"><div class="flipper min-h-[100px]"><div class="card-front glass-card p-4 flex items-center gap-4 cursor-pointer"><div class="flex-shrink-0 text-center bg-indigo-900/50 rounded-lg p-3 w-20"><span class="text-green-300 font-bold text-xl">JUL</span><span class="block text-green-300/80 text-sm font-semibold">'25</span></div><h3 class="font-semibold text-green-200">Engagement Features</h3></div><div class="card-back colored-panel p-4 flex flex-col justify-center text-left"><div class="p-2"><h3 class="font-bold text-green-300">Engagement Features</h3><p class="text-sm text-blue-100 mt-2">Boost engagement with survey polls and organic sharing with QR+Social Share menus.</p></div></div></div></div></div>
+                    <div class="timeline-item"><div class="flip-card" tabindex="0"><div class="flipper min-h-[100px]"><div class="card-front glass-card p-4 flex items-center gap-4 cursor-pointer"><div class="flex-shrink-0 text-center bg-indigo-900/50 rounded-lg p-3 w-20"><span class="text-green-300 font-bold text-xl">SEP</span><span class="block text-green-300/80 text-sm font-semibold">'25</span></div><h3 class="font-semibold text-green-200">Added Customization</h3></div><div class="card-back colored-panel p-4 flex flex-col justify-center text-left"><div class="p-2"><h3 class="font-bold text-green-300">Added Customization</h3><p class="text-sm text-blue-100 mt-2">Card themes, brand colors, and display font options for your name.</p></div></div></div></div></div>
                 </div>
             </section>
         </div>
     </main>
 
-    <footer class="text-center py-10">
-        <p class="text-sm text-gray-400">&copy; 2025 Hello! Signature Cards. All rights reserved.</p>
+    <footer class="text-center py-10 px-4">
+        <p class="text-sm text-gray-400">* Indicates a Pro Plan feature.</p>
+        <p class="text-sm text-gray-500 mt-4">&copy; 2025 Hello! Signature Cards. All rights reserved.</p>
     </footer>
+
+    <div id="jotform-overlay" aria-hidden="true" class="no-scrollbar">
+        <div id="jotform-panel" class="modal-panel no-scrollbar p-6 sm:p-8">
+            <button id="close-modal-btn" class="absolute top-3 right-3 text-gray-300 hover:text-white transition-colors" aria-label="Close"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></button>
+            <div class="flex-shrink-0 text-center">
+                <h3 class="text-2xl font-bold text-sky-300 mb-2">Get Early Access!</h3>
+                <p class="text-blue-100/90 text-sm max-w-xl mx-auto">Sign up for our waiting list for a chance to get a <strong>free signature credit</strong>, or join as an early <strong>Beta Adopter</strong> to help us test the app.</p>
+            </div>
+            <div class="mt-6 rounded-lg overflow-hidden border border-white/20 frame-wrap">
+                <iframe id="jotform-iframe" class="w-full" style="height: 860px;" src="https://form.jotform.com/251506550306045" frameborder="0" title="Beta Adopter and Waiting List Form" allowtransparency="true"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <button id="back-to-top" title="Go to top" class="cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
+        </svg>
+    </button>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Hamburger Menu Logic
+            // --- Hamburger Menu Logic ---
             const hamburgerBtn = document.getElementById('hamburger-btn');
             const mobileMenu = document.getElementById('mobile-menu');
             const menuOverlay = document.getElementById('menu-overlay');
@@ -564,7 +348,6 @@
             function toggleMenu() {
                 const isOpen = mobileMenu.classList.contains('is-open');
                 mobileMenu.classList.toggle('is-open');
-                
                 if (!isOpen) {
                     menuOverlay.classList.remove('pointer-events-none');
                     menuOverlay.classList.add('opacity-100');
@@ -575,20 +358,16 @@
                     document.body.classList.remove('body-no-scroll');
                 }
             }
-
             hamburgerBtn.addEventListener('click', toggleMenu);
             menuOverlay.addEventListener('click', toggleMenu);
             navLinks.forEach(link => {
                 link.addEventListener('click', () => {
-                    if (mobileMenu.classList.contains('is-open')) {
-                        toggleMenu();
-                    }
+                    if (mobileMenu.classList.contains('is-open')) toggleMenu();
                 });
             });
 
-            // REWRITTEN Flipping Card Logic for Dynamic Height
+            // --- Flipping Card Logic with Dynamic Height ---
             const flipCards = document.querySelectorAll('.flip-card');
-            
             flipCards.forEach(card => {
                 const flipper = card.querySelector('.flipper');
                 const cardFront = card.querySelector('.card-front');
@@ -598,7 +377,6 @@
                     e.stopPropagation();
                     const isFlipped = card.classList.contains('is-flipped');
                     
-                    // First, close all other cards and reset their heights
                     flipCards.forEach(otherCard => {
                         if (otherCard !== card) {
                             otherCard.classList.remove('is-flipped');
@@ -606,17 +384,13 @@
                         }
                     });
                     
-                    // Now, handle the clicked card
                     if (!isFlipped) {
-                        // Set height before flipping to animate smoothly
                         const backHeight = cardBack.scrollHeight;
                         const frontHeight = cardFront.offsetHeight;
-                        // Use the taller of the two sides, add padding for the back if needed
-                        const targetHeight = Math.max(frontHeight, backHeight + 40); // 40px accounts for p-5
+                        const targetHeight = Math.max(frontHeight, backHeight + 40); // 40px for padding
                         flipper.style.minHeight = `${targetHeight}px`;
                         card.classList.add('is-flipped');
                     } else {
-                        // If clicking the same card to close it, reset height
                         flipper.style.minHeight = null;
                         card.classList.remove('is-flipped');
                     }
@@ -629,6 +403,39 @@
                         flipAction(e);
                     }
                 });
+            });
+
+            // --- Jotform Modal Logic ---
+            const overlay = document.getElementById('jotform-overlay');
+            const panel = document.getElementById('jotform-panel');
+            const iframe = document.getElementById('jotform-iframe');
+            const closeBtn = document.getElementById('close-modal-btn');
+            const openBtns = document.querySelectorAll('.js-open-modal');
+            
+            function openModal() {
+                overlay.style.display = 'block';
+                document.body.classList.add('body-no-scroll');
+            }
+            function closeModal() {
+                overlay.style.display = 'none';
+                document.body.classList.remove('body-no-scroll');
+            }
+            openBtns.forEach(btn => btn.addEventListener('click', openModal));
+            closeBtn.addEventListener('click', closeModal);
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && overlay.style.display === 'block') closeModal(); });
+            
+            // --- Back-to-Top Button Logic ---
+            const backToTopButton = document.getElementById('back-to-top');
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 300) {
+                    backToTopButton.classList.add('visible');
+                } else {
+                    backToTopButton.classList.remove('visible');
+                }
+            });
+            backToTopButton.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             });
         });
     </script>
