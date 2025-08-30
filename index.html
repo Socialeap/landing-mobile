@@ -321,18 +321,28 @@
         <p class="text-sm text-gray-500 mt-4">&copy; 2025 Hello! Signature Cards. All rights reserved.</p>
     </footer>
 
-    <div id="jotform-overlay" aria-hidden="true" class="no-scrollbar">
-        <div id="jotform-panel" class="modal-panel no-scrollbar p-2 sm:p-6">
-            <button id="close-modal-btn" class="absolute top-3 right-3 text-gray-300 hover:text-white transition-colors" aria-label="Close"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></button>
-            <div class="flex-shrink-0 text-center">
-                <h3 class="text-2xl font-bold text-sky-300 mb-2">Get Early Access!</h3>
-                <p class="text-blue-100/90 text-sm max-w-xl mx-auto">Sign up for our waiting list for a chance to get a <strong>free signature credit</strong>, or join as an early <strong>Beta Adopter</strong> to help us test the app.</p>
-            </div>
-            <div class="mt-6 rounded-lg overflow-hidden border border-white/20 frame-wrap">
-                <iframe id="jotform-iframe" class="w-full" style="height: 860px;" src="https://form.jotform.com/251506550306045" frameborder="0" title="Beta Adopter and Waiting List Form" allowtransparency="true"></iframe>
-            </div>
+ <div id="jotform-overlay" aria-hidden="true" class="no-scrollbar">
+    <div id="jotform-panel" class="modal-panel no-scrollbar p-2 sm:p-6">
+        <div class="mt-6 rounded-lg overflow-hidden border border-white/20 frame-wrap">
+            
+            <iframe
+              id="JotFormIFrame-251506550306045"
+              title="Hello! Waiting List & Beta Adopters"
+              onload="window.parent.scrollTo(0,0)"
+              allowtransparency="true"
+              allow="geolocation; microphone; camera; fullscreen; payment"
+              src="https://form.jotform.com/251506550306045"
+              frameborder="0"
+              style="min-width:100%;max-width:100%;height:539px;border:none;"
+              scrolling="no"
+            >
+            </iframe>
+            <script src='https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js'></script>
+            <script>window.jotformEmbedHandler("iframe[id='JotFormIFrame-251506550306045']", "https://form.jotform.com/")</script>
+
         </div>
     </div>
+</div>
 
     <button id="back-to-top" title="Go to top" class="cursor-pointer">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
