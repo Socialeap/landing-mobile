@@ -1,476 +1,1082 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
+
+
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hello! Interactive Signature Cards</title>
 
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <style>
-        html {
-            scroll-behavior: smooth;
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            background-image:
-                linear-gradient(to bottom right, rgba(10,20,40,0.4), rgba(5,10,20,0.6)),
-                url('https://static.wixstatic.com/media/c3283f_9dc0517f310f4bea882c9d5455f30215~mv2.png');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }
-        .body-no-scroll {
-            overflow: hidden;
-        }
-        
-        /* --- Modern Glassmorphism & UI Styles --- */
-        .glass-card, .glass-card-pro, .colored-panel, .modal-panel {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            transition: all 0.3s ease;
-        }
-        .header-glass {
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .glass-card-pro { background: rgba(107, 51, 255, 0.1); border-color: rgba(129, 140, 248, 0.25); }
-        .colored-panel {
-            background: rgba(46, 26, 104, 0.2);
-            border: 1px solid rgba(129, 140, 248, 0.25);
-        }
-        .pricing-card {
-            background: rgba(20, 83, 100, 0.25);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
+  <title>Hello! Interactive Signature Cards</title>
 
-        /* --- Flipping Card Mechanics --- */
-        .flip-card {
-            perspective: 1500px;
-        }
-        .flipper {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            transform-style: preserve-3d;
-            transition: transform 0.6s, min-height 0.4s ease-in-out;
-        }
-        .flip-card.is-flipped .flipper {
-            transform: rotateY(180deg);
-        }
-        .card-front, .card-back {
-            width: 100%;
-            height: 100%;
-            -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
-            border-radius: 0.75rem; /* 12px */
-        }
-        .card-back {
-            transform: rotateY(180deg);
-            position: absolute;
-            top: 0;
-        }
 
-        /* --- Mobile Menu --- */
-        #mobile-menu {
-            transition: transform 0.3s ease-in-out;
-            transform: translateX(100%);
-        }
-        #mobile-menu.is-open {
-            transform: translateX(0);
-        }
-        #menu-overlay {
-            transition: opacity 0.3s ease-in-out;
-        }
-        
-        /* --- General & Utility Styles --- */
-        .text-shadow { text-shadow: 0px 2px 4px rgba(0,0,0,0.5); }
-        .anchor-offset { scroll-margin-top: 100px; }
-        .cta-button { transition: all 0.3s ease; }
-        .cta-button:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(10,20,40,0.3); }
-        .modal-panel { background: rgba(23, 33, 62, 0.6); border: 1px solid rgba(129, 140, 248, 0.35); }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        /* --- Roadmap Timeline (Mobile friendly) --- */
-        .timeline-container {
-            position: relative;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-        .timeline-container::after {
-            content: '';
-            position: absolute;
-            width: 3px;
-            background-color: rgba(129, 140, 248, 0.25);
-            top: 0;
-            bottom: 0;
-            left: 20px;
-            margin-left: -1.5px;
-            border-radius: 3px;
-        }
-        .timeline-item {
-            padding-left: 55px;
-            position: relative;
-            margin-bottom: 20px;
-        }
-        .timeline-item::after {
-            content: '';
-            position: absolute;
-            width: 25px;
-            height: 25px;
-            left: 8px;
-            background: linear-gradient(to bottom right, #818cf8, #60a5fa);
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            top: 50%;
-            transform: translateY(-50%);
-            border-radius: 50%;
-            z-index: 10;
-        }
 
-        /* --- Jotform Modal --- */
-        #jotform-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; z-index: 50; overflow: auto; -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
-        #jotform-panel { position: absolute; left: 50%; transform: translateX(-50%); border-radius: 1rem; box-shadow: 0 25px 60px rgba(0,0,0,0.45); width: min(880px, 94vw); }
-        #jotform-panel .frame-wrap { max-height: calc(100vh - 64px); }
+  <script src="https://cdn.tailwindcss.com"></script>
 
-        /* --- Back-to-Top Button --- */
-        #back-to-top {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 40;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            background: rgba(41, 154, 212, 0.4);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-        #back-to-top.visible {
-            display: flex;
-        }
-        #back-to-top:hover {
-            background: rgba(41, 154, 212, 0.7);
-            transform: scale(1.1);
-        }
-    </style>
+
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lobster&display=swap" rel="stylesheet" />
+
+
+
+  <style>
+
+    html {
+
+      scroll-behavior: smooth;
+
+      font-size: 16px; /* Fix for Wix embed scaling issue */
+
+    }
+
+    body {
+
+      font-family: 'Inter', sans-serif;
+
+      background-image:
+
+        linear-gradient(to bottom right, rgba(10,20,40,0.4), rgba(5,10,20,0.6)),
+
+        url('https://static.wixstatic.com/media/c3283f_9dc0517f310f4bea882c9d5455f30215~mv2.png');
+
+      background-size: cover; background-position: center; background-attachment: fixed;
+
+    }
+
+    .font-lobster { font-family: 'Lobster', cursive; }
+
+
+
+    .glass-card, .glass-card-alt, .pricing-card, .modal-panel, .glass-card-pro {
+
+      background: rgba(255,255,255,0.05);
+
+      backdrop-filter: blur(16px);
+
+      -webkit-backdrop-filter: blur(16px);
+
+      border: 1px solid rgba(255,255,255,0.15);
+
+      transition: all 0.3s ease;
+
+    }
+
+ #page-header {
+
+  background: rgba(255, 255, 255, 0.2);
+
+  backdrop-filter: blur(20px);
+
+  -webkit-backdrop-filter: blur(20px);
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+
+  
+
+}
+
+    .glass-card:hover, .glass-card-alt:hover, .pricing-card:hover, .glass-card-pro:hover {
+
+      transform: translateY(-5px) scale(1.02);
+
+      border-color: rgba(56, 189, 248, 0.4);
+
+      box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+
+    }
+
+    .glass-card-alt { background: rgba(125,211,252,0.15); border-color: rgba(125,211,252,0.3); }
+
+    .glass-card-pro { background: rgba(107, 51, 255, 0.1); border-color: rgba(129, 140, 248, 0.25); }
+
+    .glass-card-pro:hover { border-color: rgba(167, 139, 250, 0.5); }
+
+
+
+    .colored-panel {
+
+      background: rgba(46, 26, 104, 0.2);
+
+      backdrop-filter: blur(16px);
+
+      -webkit-backdrop-filter: blur(16px);
+
+      border: 1px solid rgba(129, 140, 248, 0.25);
+
+      transition: all 0.3s ease;
+
+    }
+
+    .pricing-card { background: rgba(20, 83, 100, 0.25); }
+
+    .cta-button { transition: all 0.3s ease; }
+
+    .cta-button:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(10,20,40,0.3); }
+
+    .text-shadow { text-shadow: 0px 2px 4px rgba(0,0,0,0.5); }
+
+    .modal-panel { background: rgba(23, 33, 62, 0.6); border: 1px solid rgba(129, 140, 248, 0.35); }
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .anchor-offset { scroll-margin-top: 120px; }
+
+
+
+    /* Styles for Zig-Zag Flip Card Timeline */
+
+    .timeline-container {
+
+      position: relative;
+
+      max-width: 1000px;
+
+      margin: 0 auto;
+
+    }
+
+    .timeline-container::after {
+
+      content: '';
+
+      position: absolute;
+
+      width: 3px;
+
+      background-color: rgba(129, 140, 248, 0.25);
+
+      top: 0;
+
+      bottom: 0;
+
+      left: 50%;
+
+      margin-left: -1.5px;
+
+      border-radius: 3px;
+
+    }
+
+    .timeline-item {
+
+      padding: 0 40px;
+
+      margin-bottom: 5px;
+
+      position: relative;
+
+      width: 50%;
+
+    }
+
+      .timeline-item::after {
+
+      content: '';
+
+      position: absolute;
+
+      width: 25px;
+
+      height: 25px;
+
+      right: -14px;
+
+      background: linear-gradient(to bottom right, #818cf8, #60a5fa);
+
+      border: 4px solid rgba(255, 255, 255, 0.1);
+
+      top: 50%;
+
+      transform: translateY(-50%);
+
+      border-radius: 50%;
+
+      z-index: 10;
+
+    }
+
+    .timeline-item.left { left: 0; }
+
+    .timeline-item.right { left: 50%; }
+
+    .timeline-item.right::after { left: -11px; }
+
+
+
+    .flip-card-container {
+
+      perspective: 1500px;
+
+      width: 100%;
+
+      height: 120px;
+
+    }
+
+    .flipper {
+
+      position: relative;
+
+      width: 100%;
+
+      height: 100%;
+
+      transition: transform 0.6s;
+
+      transform-style: preserve-3d;
+
+    }
+
+    .flip-card-container.is-flipped .flipper {
+
+      transform: rotateY(180deg);
+
+    }
+
+    .card-front, .card-back {
+
+      position: absolute;
+
+      width: 100%;
+
+      height: 100%;
+
+      -webkit-backface-visibility: hidden;
+
+      backface-visibility: hidden;
+
+      border-radius: 1rem;
+
+      display: flex;
+
+      align-items: center;
+
+    }
+
+    .card-back {
+
+      transform: rotateY(180deg);
+
+    }
+
+
+
+    #jotform-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; z-index: 50; overflow: auto; -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
+
+    #jotform-panel { position: absolute; left: 50%; transform: translateX(-50%); border-radius: 1rem; box-shadow: 0 25px 60px rgba(0,0,0,0.45); width: min(880px, 94vw); }
+
+    #jotform-panel .frame-wrap { max-height: calc(100vh - 64px); }
+
+    
+
+    #back-to-top {
+
+      position: fixed;
+
+      bottom: 30px;
+
+      right: 30px;
+
+      z-index: 40;
+
+      border: none;
+
+      outline: none;
+
+      cursor: pointer;
+
+      width: 50px;
+
+      height: 50px;
+
+      border-radius: 50%;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      background: rgba(41, 154, 212, 0.4);
+
+      backdrop-filter: blur(10px);
+
+      -webkit-backdrop-filter: blur(10px);
+
+      border: 1px solid rgba(255, 255, 255, 0.2);
+
+      color: white;
+
+      transition: transform 0.3s ease, background-color 0.3s ease;
+
+    }
+
+    #back-to-top:hover {
+
+      background: rgba(41, 154, 212, 0.7);
+
+      transform: scale(1.1);
+
+    }
+
+    
+
+    /* --- ANIMATION STYLES --- */
+
+    .fade-up {
+
+        opacity: 0;
+
+        transform: translateY(30px);
+
+        transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+
+    }
+
+    .fade-up.is-visible {
+
+        opacity: 1;
+
+        transform: translateY(0);
+
+    }
+
+    .slide-in-left {
+
+        opacity: 0;
+
+        transform: translateX(-40px);
+
+        transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+
+    }
+
+    .slide-in-left.is-visible {
+
+        opacity: 1;
+
+        transform: translateX(0);
+
+    }
+
+    .slide-in-right {
+
+        opacity: 0;
+
+        transform: translateX(40px);
+
+        transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+
+    }
+
+    .slide-in-right.is-visible {
+
+        opacity: 1;
+
+        transform: translateX(0);
+
+    }
+
+    
+
+    /* --- UTILITY STYLES --- */
+
+    .no-scrollbar-iframe::-webkit-scrollbar {
+
+        display: none;
+
+    }
+
+    .no-scrollbar-iframe {
+
+        -ms-overflow-style: none;
+
+        scrollbar-width: none;
+
+    }
+
+
+
+  </style>
+
 </head>
 
-<body class="bg-slate-900 text-white">
-    <header id="page-header" class="header-glass sticky top-0 z-40">
-        <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
-             <div class="flex items-center gap-3">
-                 <div class="flex flex-col">
-                     <img src="https://static.wixstatic.com/media/c3283f_3b2b091901824c70b23fd04df9865da7~mv2.png" alt="Hello! Logo" class="h-20 -ml-4">
-                     <span class="font-medium text-sky-300/90 text-xs italic -mt-2"></span>
-                 </div>
-             </div>
-             <button id="hamburger-btn" class="p-2 z-50 md:hidden" aria-label="Open menu">
-                 <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
-             </button>
-             <div class="hidden md:flex items-center space-x-6">
-                 <a href="#features" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Features</a>
-                 <a href="#optimization" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Optimization</a>
-                 <a href="#use-cases" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Use Cases</a>
-                 <a href="#pricing" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Pricing</a>
-                 <a href="#roadmap" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Road Map</a>
-                 <a href="https://www.socialeap.net/hello-tips" target="_blank" rel="noopener" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Tips</a>
-             </div>
-        </nav>
-    </header>
 
-    <div id="menu-overlay" class="fixed inset-0 bg-black/60 z-40 opacity-0 pointer-events-none md:hidden"></div>
-    <nav id="mobile-menu" class="glass-card fixed top-0 right-0 h-full w-64 pt-24 p-6 z-50 md:hidden">
-        <div class="flex flex-col space-y-6">
-            <a href="#features" class="nav-link text-lg font-semibold text-gray-200 hover:text-sky-300">Features</a>
-            <a href="#optimization" class="nav-link text-lg font-semibold text-gray-200 hover:text-sky-300">Optimization</a>
-            <a href="#use-cases" class="nav-link text-lg font-semibold text-gray-200 hover:text-sky-300">Use Cases</a>
-            <a href="#pricing" class="nav-link text-lg font-semibold text-gray-200 hover:text-sky-300">Pricing</a>
-            <a href="#roadmap" class="nav-link text-lg font-semibold text-gray-200 hover:text-sky-300">Road Map</a>
-            <a href="https://www.socialeap.net/hello-tips" target="_blank" rel="noopener" class="nav-link text-lg font-semibold text-gray-200 hover:text-sky-300">Tips</a>
-        </div>
-    </nav>
 
-    <main class="container mx-auto px-4 py-12 sm:py-16">
-        <section id="hero" class="text-center max-w-4xl mx-auto">
-             <h1 class="text-4xl sm:text-6xl font-extrabold leading-tight tracking-tight text-shadow">
-                 <span class="block">Transform Your Introductions</span>
-                 <span class="block text-sky-300">Into Smarter Interactive Connections.</span>
-             </h1>
-             <p class="mt-6 text-base sm:text-xl text-blue-100/90 max-w-3xl mx-auto text-shadow">
-                Build dynamic, professional Signature Cards that amplify your brand, drive more engagement, and foster smarter connections.
-             </p>
-             <div class="mt-10">
-                 <button class="js-open-modal cta-button bg-sky-600/50 hover:bg-sky-500/70 border border-sky-400 text-white font-semibold py-3 px-8 rounded-lg text-lg">
-                     Join the Waiting List
-                 </button>
-             </div>
-        </section>
+<body class="bg-gray-900 text-white">
 
-        <section class="mt-24 sm:mt-32 text-center">
-            <div class="max-w-sm mx-auto rounded-2xl overflow-hidden shadow-2xl border-2 border-white/10 p-2 glass-card">
-                <div class="relative w-full h-0 pb-[177.78%] rounded-lg overflow-hidden">
-                     <iframe 
-                         src="https://view.genial.ly/687036af140aa8640ee8f2c5" 
-                         class="absolute top-0 left-0 w-full h-full" 
-                         frameborder="0" 
-                         allow="autoplay; fullscreen" 
-                         allowfullscreen="true" 
-                         title="Hello! Interactive Email Signature Cards">
-                    </iframe>
-                </div>
-            </div>
-             <div class="mt-8">
-                 <button class="js-open-modal cta-button bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 px-8 rounded-lg text-base sm:text-lg">
-                     Join the Waiting List
-                 </button>
-             </div>
-        </section>
-        
-        <div class="space-y-20 mt-24 sm:mt-32">
-            <section id="features" class="anchor-offset">
-                <h2 class="text-3xl sm:text-4xl font-bold text-center mb-8 text-shadow">1. Easily Create Perfect Signatures</h2>
-                <div class="space-y-4 max-w-3xl mx-auto">
-                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg><h3 class="text-lg font-bold text-sky-400">Intuitive Signature Builder</h3></div><span class="text-2xl text-sky-400/70 ml-4">+</span></div><div class="card-back glass-card p-5 flex items-center"><p class="text-gray-200">Our user-friendly builder provides a real-time preview as you craft the perfect signature, making the design process a breeze.</p></div></div></div>
-                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg><h3 class="text-lg font-bold text-sky-400">Deep Customization</h3></div><span class="text-2xl text-sky-400/70 ml-4">+</span></div><div class="card-back glass-card p-5 flex items-center"><p class="text-gray-200">Control every detail, from brand colors and fonts to logos, social icons, and custom call-to-action buttons.</p></div></div></div>
-                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0l5-5 5 5m-10 0v2m10-2v2" /></svg><h3 class="text-lg font-bold text-sky-400">Multiple Signature Management</h3></div><span class="text-2xl text-sky-400/70 ml-4">+</span></div><div class="card-back glass-card p-5 flex items-center"><p class="text-gray-200">Easily create, manage, and switch between multiple signatures for different roles or campaigns from a single dashboard.</p></div></div></div>
-                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg><h3 class="text-lg font-bold text-sky-400">One-Click Copy & Paste</h3></div><span class="text-2xl text-sky-400/70 ml-4">+</span></div><div class="card-back glass-card p-5 flex items-center"><p class="text-gray-200">Our secure copy process ensures your signature pastes perfectly into any email client, avoiding broken formatting issues.</p></div></div></div>
-                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg><h3 class="text-lg font-bold text-sky-400">Guaranteed Compatibility</h3></div><span class="text-2xl text-sky-400/70 ml-4">+</span></div><div class="card-back glass-card p-5 flex items-center"><p class="text-gray-200">Signatures are built to be compatible and responsive, ensuring they look perfect in Gmail, Outlook, Apple Mail, and more.</p></div></div></div>
-                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/></svg><h3 class="text-lg font-bold text-sky-400">Mini-Game Challenges</h3></div><span class="text-2xl text-sky-400/70 ml-4">+</span></div><div class="card-back glass-card p-5 flex items-center"><p class="text-gray-200">Test your mental acuity with fun, built-in games inside the app. Compete with others and win credits and rewards!</p></div></div></div>
-                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg><h3 class="text-lg font-bold text-sky-400">AI Supported Customization</h3></div><span class="text-2xl text-sky-400/70 ml-4">+</span></div><div class="card-back glass-card p-5 flex items-center"><p class="text-gray-200">Go beyond standard templates with help from our GPT design assistant. Just ask. Our GPT is context-aware to help design signatures that perfectly match your brand.</p></div></div></div>
-                </div>
-            </section>
-            
-            <section id="viewer-experience" class="anchor-offset">
-                <h2 class="text-3xl sm:text-4xl font-bold text-center mb-8 text-shadow">2. Easily Engage Your Audience</h2>
-                <div class="space-y-4 max-w-3xl mx-auto">
-                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card-pro p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg class="h-6 w-6 text-green-400 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="4"><animate attributeName="r" from="4" to="8" dur="1.5s" begin="0s" repeatCount="indefinite" /><animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0s" repeatCount="indefinite" /></circle><circle cx="12" cy="12" r="4" /></svg><h3 class="text-lg font-bold text-indigo-300">Live Profile Sync</h3></div><span class="text-2xl text-indigo-300/70 ml-4">+</span></div><div class="card-back glass-card-pro p-5 flex items-center"><p class="text-gray-200">Email signatures include a '🟢 Live' icon, linking recipients to your card for the latest info and interactive features.</p></div></div></div>
-                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card-pro p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg><h3 class="text-lg font-bold text-indigo-300">No Branding But Yours</h3></div><span class="text-2xl text-indigo-300/70 ml-4">+</span></div><div class="card-back glass-card-pro p-5 flex items-center"><p class="text-gray-200">Your signature is yours alone. We never add our own branding or "Sent with" links to your final signature card.</p></div></div></div>
-                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card-pro p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg><h3 class="text-lg font-bold text-indigo-300">Viewer Engagement Stats<sup class="text-indigo-400">*</sup></h3></div><span class="text-2xl text-indigo-300/70 ml-4">+</span></div><div class="card-back glass-card-pro p-5 flex items-center"><p class="text-gray-200">Unlock statistics to see how your audience interacts with your card, including views, clicks, and social shares.</p></div></div></div>
-                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card-pro p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2V6a2 2 0 012-2h2.586a1 1 0 01.707.293l1.414 1.414a1 1 0 00.707.293H17z" /></svg><h3 class="text-lg font-bold text-indigo-300">Interactive Polls<sup class="text-indigo-400">*</sup></h3></div><span class="text-2xl text-indigo-300/70 ml-4">+</span></div><div class="card-back glass-card-pro p-5 flex items-center"><p class="text-gray-200">Boost engagement with survey polls and organic sharing with QR+Social Share menus.</p></div></div></div>
-                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card-pro p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367 2.684z" /></svg><h3 class="text-lg font-bold text-indigo-300">Easy Social Sharing<sup class="text-indigo-400">*</sup></h3></div><span class="text-2xl text-indigo-300/70 ml-4">+</span></div><div class="card-back glass-card-pro p-5 flex items-center"><p class="text-gray-200">Your public signature page includes a share menu, making it simple for viewers to share your card across their networks.</p></div></div></div>
-                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card-pro p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg><h3 class="text-lg font-bold text-indigo-300">Google Maps Locator<sup class="text-indigo-400">*</sup></h3></div><span class="text-2xl text-indigo-300/70 ml-4">+</span></div><div class="card-back glass-card-pro p-5 flex items-center"><p class="text-gray-200">Add a map to your signature card, allowing viewers to easily find your business or event location.</p></div></div></div>
-                </div>
-            </section>
-            
-            <section id="linkup-flagship" class="anchor-offset text-center">
-                <h2 class="text-3xl sm:text-4xl font-bold text-center mb-4 text-shadow">3. Easily Automate Smarter LinkUps</h2>
-                <p class="text-center max-w-3xl mx-auto mt-4 mb-12 text-sm sm:text-lg text-blue-100">
-                    With AI built in, assessing shared interests & mutual fit for smarter, more aligned connections has never been easier!
-                </p>
-                <div class="space-y-4 max-w-3xl mx-auto">
-                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card-pro p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg><h3 class="text-lg font-bold text-indigo-300">Action Items</h3></div><span class="text-2xl text-indigo-300/70 ml-4">+</span></div><div class="card-back glass-card-pro p-5 flex items-center"><p class="text-gray-200">Select the types of offers or action requests that your card viewers can pick in their LinkUp requests, or create your own.</p></div></div></div>
-                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card-pro p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg><h3 class="text-lg font-bold text-indigo-300">Set Your Availability</h3></div><span class="text-2xl text-indigo-300/70 ml-4">+</span></div><div class="card-back glass-card-pro p-5 flex items-center"><p class="text-gray-200">Not around for a week or two? Set your status to Unavailable with optional return date.</p></div></div></div>
-                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card-pro p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg><h3 class="text-lg font-bold text-indigo-300">Add Focus Phrases</h3></div><span class="text-2xl text-indigo-300/70 ml-4">+</span></div><div class="card-back glass-card-pro p-5 flex items-center"><p class="text-gray-200">Feel free to prioritize certain industries, roles, professions, or activities that our AI can have on its radar.</p></div></div></div>
-                    <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card-pro p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><h3 class="text-lg font-bold text-indigo-300">Pre-Assessed Recommendations</h3></div><span class="text-2xl text-indigo-300/70 ml-4">+</span></div><div class="card-back glass-card-pro p-5 flex items-center"><p class="text-gray-200">Anyone viewing your card can request a LinkUp but only after a quick intake. Viewers immediately get a recommendation to Pass or Proceed.</p></div></div></div>
-                </div>
-                <div class="mt-12">
-                    <button id="toggle-demo-btn" class="cta-button bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-8 rounded-lg text-base sm:text-lg">
-                        See LinkUp Demo
-                    </button>
-                    <iframe id="linkup-demo-iframe" src="https://socialeap.github.io/hello-linkup/" class="w-full h-[820px] mt-6 rounded-xl border border-indigo-400/20 no-scrollbar-iframe" style="display: none;"></iframe>
-                </div>
-            </section>
-            
-            <section id="optimization" class="anchor-offset">
-                <h2 class="text-3xl sm:text-4xl font-bold text-center mb-4 text-shadow"><span class="block">Built for Discovery</span> <span class="block text-sky-300">AI & SEO Optimized</span></h2>
-                <p class="text-center max-w-3xl mx-auto mb-8 text-sm sm:text-lg text-blue-100">In today's digital world, just having a profile isn't enough. Your Hello! Signature Card is engineered to be found. We use advanced techniques to ensure search engines and AI models can easily discover and understand your professional expertise, putting you in front of the right audience.</p>
-                <div class="space-y-4 max-w-3xl mx-auto">
-                     <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg><h3 class="text-lg font-bold text-sky-400">For Search Engines (SEO)</h3></div><span class="text-2xl text-sky-400/70 ml-4">+</span></div><div class="card-back glass-card p-5 flex items-center"><ul class="space-y-2 text-gray-200 text-sm"><li class="flex items-start"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>Unique URLs for every signature card</span></li><li class="flex items-start"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>Dynamic meta titles & rich descriptions</span></li><li class="flex items-start"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>Enhanced JSON-LD Person schema</span></li></ul></div></div></div>
-                     <div class="flip-card" tabindex="0"><div class="flipper"><div class="card-front glass-card p-5 flex items-center justify-between cursor-pointer min-h-[96px]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg><h3 class="text-lg font-bold text-sky-400">For AI Models</h3></div><span class="text-2xl text-sky-400/70 ml-4">+</span></div><div class="card-back glass-card p-5 flex items-center"><ul class="space-y-2 text-gray-200 text-sm"><li class="flex items-start"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>AI-friendly FAQ schemas</span></li><li class="flex items-start"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>Structured Q&A for direct answers</span></li><li class="flex items-start"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>Semantic HTML for better understanding</span></li></ul></div></div></div>
-                </div>
-            </section>
-            
-            <section id="use-cases" class="anchor-offset">
-                <h2 class="text-3xl sm:text-4xl font-bold text-center mb-8 text-shadow">One Signature, Countless Applications</h2>
-                <div class="colored-panel p-6 sm:p-8 rounded-2xl shadow-lg max-w-3xl mx-auto">
-                    <img src="https://static.wixstatic.com/media/c3283f_4e87e2632190447fb5eb7d608c0783cf~mv2.png" alt="Example of a shareable Hello signature card" class="rounded-lg shadow-lg mx-auto w-full max-w-xs mb-6">
-                    <h3 class="text-2xl font-bold mb-2 text-center">Designed to be Shared</h3>
-                    <p class="text-blue-100 text-center text-sm sm:text-base">Your Hello! Signature Card isn't just a compact presentation of your professional profile. It's designed for posting and embedding into a variety of social media, document formats, and messaging apps. Each Signature page can be optimized with a Share Menu that lets viewers share your card with their own social networks.</p>
-                </div>
-                <div class="max-w-3xl mx-auto grid grid-cols-2 gap-4 text-center mt-8">
-                    <div class="colored-panel p-4 rounded-lg flex items-center justify-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg><p class="text-sm">Email Clients</p></div>
-                    <div class="colored-panel p-4 rounded-lg flex items-center justify-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg><p class="text-sm">LinkedIn Profiles</p></div>
-                    <div class="colored-panel p-4 rounded-lg flex items-center justify-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3h9M7 16h6M7 8h6v4H7V8z" /></svg><p class="text-sm">Blog Post Bios</p></div>
-                    <div class="colored-panel p-4 rounded-lg flex items-center justify-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg><p class="text-sm">CRM Templates</p></div>
-                </div>
-            </section>
-            
-            <section id="pricing" class="anchor-offset">
-                <h2 class="text-3xl sm:text-4xl font-bold text-center mb-8 text-shadow">Start Here... and Get your Brand Anywhere</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-                    <div class="pricing-card p-6 rounded-2xl flex flex-col text-center h-full border-2 border-sky-500"><h3 class="text-2xl font-bold text-sky-400">Design your Card</h3><div class="my-6 flex-grow"><p class="text-4xl font-extrabold text-sky-300">$0.00</p><p class="text-gray-300 font-bold">Free, Forever</p></div><ul class="text-left space-y-3 text-gray-200 mb-6 text-sm"><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Easy-to-use Builder & Dashboard</li><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Profile & Background Image</li><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Custom Button Links</li><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Social Media Icons</li><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>.vCard Download</li></ul><button class="js-open-modal cta-button mt-auto w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 rounded-lg">Join Waiting List</button></div>
-                    <div class="pricing-card p-6 rounded-2xl flex flex-col text-center h-full border-2 border-sky-500"><h3 class="text-2xl font-bold text-sky-400">Publisher Pack</h3><div class="my-6 flex-grow"><p class="text-4xl font-extrabold text-sky-300">$4.99</p><p class="text-gray-300 font-bold">One-Time Payment</p></div><ul class="text-left space-y-3 text-gray-200 mb-6 text-sm"><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>3 Publishing Slots</li><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Embeds for a Variety of Content</li><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Shareable Links to Card Pages</li><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Earn Credits via Referrals & Game Challenges</li></ul><button class="js-open-modal cta-button mt-auto w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 rounded-lg">Join Waiting List</button></div>
-                    <div class="pricing-card p-6 rounded-2xl flex flex-col text-center h-full border-2 border-indigo-500 relative"><span class="absolute top-0 -mt-3 left-1/2 -translate-x-1/2 bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">PRO</span><h3 class="text-2xl font-bold text-indigo-400">Pro Plan</h3><div class="my-6 flex-grow"><p class="text-4xl font-extrabold text-indigo-300">$3.99<span class="text-lg font-medium text-gray-300">/mo</span></p><p class="text-gray-300 font-bold">Save 23% at $36.99/yr</p></div><ul class="text-left space-y-3 text-gray-200 mb-6 text-sm"><li class="flex items-center"><svg class="w-5 h-5 text-indigo-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>AI Enhanced LinkUp</li><li class="flex items-center"><svg class="w-5 h-5 text-indigo-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Views & Activity Stats</li><li class="flex items-center"><svg class="w-5 h-5 text-indigo-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Social Share Menu</li><li class="flex items-center"><svg class="w-5 h-5 text-indigo-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Add a Social Poll</li><li class="flex items-center"><svg class="w-5 h-5 text-indigo-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Google Maps Locator</li></ul><p class="text-xs text-gray-400 mt-2">* Publisher Pack purchase required.</p><button class="js-open-modal cta-button mt-auto pt-4 w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg">Join Waiting List</button></div>
-                </div>
-            </section>
-            
-            <section id="roadmap" class="anchor-offset">
-                <h2 class="text-3xl sm:text-4xl font-bold text-center mb-2 text-shadow">Hello! Road Map</h2>
-                <p class="text-center text-blue-100 mb-10">What’s shipping next — and when. Click a card to learn more.</p>
-                <div class="timeline-container">
-                    <div class="timeline-item"><div class="flip-card" tabindex="0"><div class="flipper min-h-[100px]"><div class="card-front glass-card p-4 flex items-center gap-4 cursor-pointer"><div class="flex-shrink-0 text-center bg-indigo-900/50 rounded-lg p-3 w-20"><span class="text-green-300 font-bold text-xl">MAR</span><span class="block text-green-300/80 text-sm font-semibold">'25</span></div><h3 class="font-semibold text-green-200">Basic Email Signature Builder</h3></div><div class="card-back colored-panel p-4 flex flex-col justify-center text-left"><div class="p-2"><h3 class="font-bold text-green-300">Basic Email Signature Builder</h3><p class="text-sm text-blue-100 mt-2">Craft clean, compatible signatures for Gmail and Outlook. Copy-paste ready with live preview.</p></div></div></div></div></div>
-                    <div class="timeline-item"><div class="flip-card" tabindex="0"><div class="flipper min-h-[100px]"><div class="card-front glass-card p-4 flex items-center gap-4 cursor-pointer"><div class="flex-shrink-0 text-center bg-indigo-900/50 rounded-lg p-3 w-20"><span class="text-green-300 font-bold text-xl">MAY</span><span class="block text-green-300/80 text-sm font-semibold">'25</span></div><h3 class="font-semibold text-green-200">Dynamic Signature Builder</h3></div><div class="card-back colored-panel p-4 flex flex-col justify-center text-left"><div class="p-2"><h3 class="font-bold text-green-300">Dynamic Signature Builder</h3><p class="text-sm text-blue-100 mt-2">Publish a live, shareable signature page with public viewing links.</p></div></div></div></div></div>
-                    <div class="timeline-item"><div class="flip-card" tabindex="0"><div class="flipper min-h-[100px]"><div class="card-front glass-card p-4 flex items-center gap-4 cursor-pointer"><div class="flex-shrink-0 text-center bg-indigo-900/50 rounded-lg p-3 w-20"><span class="text-green-300 font-bold text-xl">JUL</span><span class="block text-green-300/80 text-sm font-semibold">'25</span></div><h3 class="font-semibold text-green-200">Engagement Features</h3></div><div class="card-back colored-panel p-4 flex flex-col justify-center text-left"><div class="p-2"><h3 class="font-bold text-green-300">Engagement Features</h3><p class="text-sm text-blue-100 mt-2">Boost engagement with survey polls and organic sharing with QR+Social Share menus.</p></div></div></div></div></div>
-                    <div class="timeline-item"><div class="flip-card" tabindex="0"><div class="flipper min-h-[100px]"><div class="card-front glass-card p-4 flex items-center gap-4 cursor-pointer"><div class="flex-shrink-0 text-center bg-indigo-900/50 rounded-lg p-3 w-20"><span class="text-green-300 font-bold text-xl">SEP</span><span class="block text-green-300/80 text-sm font-semibold">'25</span></div><h3 class="font-semibold text-green-200">Introduced Hello! LinkUp</h3></div><div class="card-back colored-panel p-4 flex flex-col justify-center text-left"><div class="p-2"><h3 class="font-bold text-green-300">Introduced Hello! LinkUp</h3><p class="text-sm text-blue-100 mt-2">Finally! A smart system to assess, filter, and recommend social connections for better alignment with your focus & interests.</p></div></div></div></div></div>
-                    <div class="timeline-item"><div class="flip-card" tabindex="0"><div class="flipper min-h-[100px]"><div class="card-front glass-card p-4 flex items-center gap-4 cursor-pointer"><div class="flex-shrink-0 text-center bg-indigo-900/50 rounded-lg p-3 w-20"><span class="text-green-300 font-bold text-xl">OCT</span><span class="block text-green-300/80 text-sm font-semibold">'25</span></div><h3 class="font-semibold text-green-200">Public Launch Point</h3></div><div class="card-back colored-panel p-4 flex flex-col justify-center text-left"><div class="p-2"><h3 class="font-bold text-green-300">Public Launch Point</h3><p class="text-sm text-blue-100 mt-2">Earmarked mid October to open Hello! to the public as a new, smarter networking & social marketing tool.</p></div></div></div></div></div>
-                    <div class="timeline-item"><div class="flip-card" tabindex="0"><div class="flipper min-h-[100px]"><div class="card-front glass-card p-4 flex items-center gap-4 cursor-pointer"><div class="flex-shrink-0 text-center bg-indigo-900/50 rounded-lg p-3 w-20"><span class="text-green-300 font-bold text-xl">NOV</span><span class="block text-green-300/80 text-sm font-semibold">'25</span></div><h3 class="font-semibold text-green-200">Signature Spotlights</h3></div><div class="card-back colored-panel p-4 flex flex-col justify-center text-left"><div class="p-2"><h3 class="font-bold text-green-300">Signature Spotlights</h3><p class="text-sm text-blue-100 mt-2">Curated gallery highlighting standout Signature Cards from the community.</p></div></div></div></div></div>
-                    <div class="timeline-item"><div class="flip-card" tabindex="0"><div class="flipper min-h-[100px]"><div class="card-front glass-card p-4 flex items-center gap-4 cursor-pointer"><div class="flex-shrink-0 text-center bg-indigo-900/50 rounded-lg p-3 w-20"><span class="text-green-300 font-bold text-xl">FEB</span><span class="block text-green-300/80 text-sm font-semibold">'26</span></div><h3 class="font-semibold text-green-200">Hello! Teams</h3></div><div class="card-back colored-panel p-4 flex flex-col justify-center text-left"><div class="p-2"><h3 class="font-bold text-green-300">Hello! Teams</h3><p class="text-sm text-blue-100 mt-2">Centralized admin dashboard for companies to manage employee signatures, enforce brand consistency, and streamline distribution.</p></div></div></div></div></div>
-                    <div class="timeline-item"><div class="flip-card" tabindex="0"><div class="flipper min-h-[100px]"><div class="card-front glass-card p-4 flex items-center gap-4 cursor-pointer"><div class="flex-shrink-0 text-center bg-indigo-900/50 rounded-lg p-3 w-20"><span class="text-green-300 font-bold text-xl">MAR</span><span class="block text-green-300/80 text-sm font-semibold">'26</span></div><h3 class="font-semibold text-green-200">Directory Platform</h3></div><div class="card-back colored-panel p-4 flex flex-col justify-center text-left"><div class="p-2"><h3 class="font-bold text-green-300">Directory Platform</h3><p class="text-sm text-blue-100 mt-2">Discover people by tags and expertise in a searchable network of Cards.</p></div></div></div></div></div>
-                </div>
-            </section>
-        </div>
-    </main>
 
-    <footer class="text-center py-10 px-4">
-        <p class="text-sm text-gray-400">* Indicates a Pro Plan feature.</p>
-        <p class="text-sm text-gray-500 mt-4">&copy; 2025 Hello! Signature Cards. All rights reserved.</p>
-    </footer>
 
- <div id="jotform-overlay" aria-hidden="true" class="no-scrollbar">
-    <div id="jotform-panel" class="modal-panel no-scrollbar p-2 sm:p-6">
-        <div class="mt-6 rounded-lg overflow-hidden border border-white/20 frame-wrap">
-            
-            <iframe
-              id="JotFormIFrame-251506550306045"
-              title="Hello! Waiting List & Beta Adopters"
-              onload="window.parent.scrollTo(0,0)"
-              allowtransparency="true"
-              allow="geolocation; microphone; camera; fullscreen; payment"
-              src="https://form.jotform.com/251506550306045"
-              frameborder="0"
-              style="min-width:100%;max-width:100%;height:539px;border:none;"
-              scrolling="no"
-            >
-            </iframe>
-            <script src='https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js'></script>
-            <script>window.jotformEmbedHandler("iframe[id='JotFormIFrame-251506550306045']", "https://form.jotform.com/")</script>
+  <header id="page-header" class="glass-card fixed top-0 z-30 w-full">
 
-        </div>
-    </div>
-</div>
+    <nav class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
 
-    <button id="back-to-top" title="Go to top" class="cursor-pointer">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
-        </svg>
-    </button>
+      <div class="flex items-center gap-3 sm:gap-4">
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // --- Hamburger Menu Logic ---
-            const hamburgerBtn = document.getElementById('hamburger-btn');
-            const mobileMenu = document.getElementById('mobile-menu');
-            const menuOverlay = document.getElementById('menu-overlay');
-            const navLinks = document.querySelectorAll('.nav-link');
+        <div class="flex flex-col">
 
-            function toggleMenu() {
-                const isOpen = mobileMenu.classList.contains('is-open');
-                mobileMenu.classList.toggle('is-open');
-                if (!isOpen) {
-                    menuOverlay.classList.remove('pointer-events-none');
-                    menuOverlay.classList.add('opacity-100');
-                    document.body.classList.add('body-no-scroll');
-                } else {
-                    menuOverlay.classList.add('pointer-events-none');
-                    menuOverlay.classList.remove('opacity-100');
-                    document.body.classList.remove('body-no-scroll');
-                }
-            }
-            hamburgerBtn.addEventListener('click', toggleMenu);
-            menuOverlay.addEventListener('click', toggleMenu);
-            navLinks.forEach(link => {
-                link.addEventListener('click', () => {
-                    if (mobileMenu.classList.contains('is-open')) toggleMenu();
-                });
-            });
+          <img src="https://static.wixstatic.com/media/c3283f_3b2b091901824c70b23fd04df9865da7~mv2.png" alt="Hello! Logo" class="h-20 -ml-4">
 
-            // --- Flipping Card Logic with Dynamic Height ---
-            const flipCards = document.querySelectorAll('.flip-card');
-            flipCards.forEach(card => {
-                const flipper = card.querySelector('.flipper');
-                const cardFront = card.querySelector('.card-front');
-                const cardBack = card.querySelector('.card-back');
+          <span class="font-medium text-sky-300/90 text-xs italic -mt-2"></span>
 
-                const flipAction = (e) => {
-                    e.stopPropagation();
-                    const isFlipped = card.classList.contains('is-flipped');
-                    
-                    flipCards.forEach(otherCard => {
-                        if (otherCard !== card) {
-                            otherCard.classList.remove('is-flipped');
-                            otherCard.querySelector('.flipper').style.minHeight = null;
-                        }
-                    });
-                    
-                    if (!isFlipped) {
-                        const backHeight = cardBack.scrollHeight;
-                        const frontHeight = cardFront.offsetHeight;
-                        const targetHeight = Math.max(frontHeight, backHeight + 40); // 40px for padding
-                        flipper.style.minHeight = `${targetHeight}px`;
-                        card.classList.add('is-flipped');
-                    } else {
-                        flipper.style.minHeight = null;
-                        card.classList.remove('is-flipped');
-                    }
-                };
+        </div>
 
-                card.addEventListener('click', flipAction);
-                card.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        flipAction(e);
-                    }
-                });
-            });
+      </div>
 
-            // --- Jotform Modal Logic ---
-            const overlay = document.getElementById('jotform-overlay');
-            const panel = document.getElementById('jotform-panel');
-            const iframe = document.getElementById('jotform-iframe');
-            const closeBtn = document.getElementById('close-modal-btn');
-            const openBtns = document.querySelectorAll('.js-open-modal');
-            
-            function openModal() {
-                overlay.style.display = 'block';
-                document.body.classList.add('body-no-scroll');
-            }
-            function closeModal() {
-                overlay.style.display = 'none';
-                document.body.classList.remove('body-no-scroll');
-            }
-            openBtns.forEach(btn => btn.addEventListener('click', openModal));
-            if(closeBtn) closeBtn.addEventListener('click', closeModal);
-            overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
-            document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && overlay.style.display === 'block') closeModal(); });
-            
-            // --- Back-to-Top Button Logic ---
-            const backToTopButton = document.getElementById('back-to-top');
-            window.addEventListener('scroll', () => {
-                if (window.pageYOffset > 300) {
-                    backToTopButton.classList.add('visible');
-                } else {
-                    backToTopButton.classList.remove('visible');
-                }
-            });
-            backToTopButton.addEventListener('click', () => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-        });
-    </script>
+      <div class="hidden md:flex items-center space-x-6">
+
+        <a href="#features" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Features</a>
+
+        <a href="#optimization" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Optimization</a>
+
+        <a href="#use-cases" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Use Cases</a>
+
+        <a href="#pricing" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Pricing</a>
+
+        <a href="#roadmap" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Road Map</a>
+
+        <a href="https://www.socialeap.net/hello-tips" target="_blank" rel="noopener" class="text-sm font-medium text-gray-300 hover:text-sky-300 transition-colors">Tips</a>
+
+      </div>
+
+    </nav>
+
+  </header>
+
+
+
+ <main class="pt-32 pb-16">
+
+    <div class="container mx-auto px-4 sm:px-6">
+
+
+
+      <section id="hero" class="anchor-offset text-center max-w-4xl mx-auto">
+
+        <h1 class="text-3xl sm:text-5xl md:text-7xl font-extrabold leading-tight tracking-tighter text-shadow">
+
+          <span class="block">Transform Your Introductions</span>
+
+          <span class="block text-sky-300">Into Smarter Interactive Connections.</span>
+
+        </h1>
+
+        <p class="mt-6 text-sm sm:text-lg md:text-xl text-blue-100 max-w-3xl mx-auto text-shadow">
+
+          Build dynamic, professional Signature Cards that amplify your brand, drive more engagement, and foster smarter connections.
+
+        </p>
+
+        <div class="mt-10" id="waiting-list-anchor">
+
+          <button class="js-open-modal cta-button bg-sky-600/50 hover:bg-sky-500/70 border border-sky-400 text-white font-semibold py-3 px-8 rounded-lg text-base">
+
+            Join the Waiting List
+
+          </button>
+
+        </div>
+
+      </section>
+
+
+
+      <section class="mt-36 lg:mt-48 text-center">
+
+        <div class="max-w-4xl mx-auto rounded-lg overflow-hidden">
+
+          <div style="position: relative; padding-bottom: 56.25%; height: 0; width: 100%;">
+
+            <iframe
+
+              src="https://view.genial.ly/687036af140aa8640ee8f2c5"
+
+              style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+
+              frameborder="0"
+
+              allow="autoplay; fullscreen"
+
+              allowfullscreen="true"
+
+              title="Hello! Interactive Email Signature Cards">
+
+            </iframe>
+
+          </div>
+
+        </div>
+
+        <div class="mt-8">
+
+          <button class="js-open-modal cta-button bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 px-8 rounded-lg text-base sm:text-lg">
+
+            Join the Waiting List
+
+          </button>
+
+        </div>
+
+      </section>
+
+
+
+      <section id="features" class="anchor-offset mt-36 lg:mt-48">
+
+        <h2 class="text-2xl sm:text-4xl font-bold text-center mb-8 sm:mb-12 text-shadow fade-up">1. Easily Create Perfect Signatures</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 animate-stagger">
+
+          <div class="glass-card p-5 sm:p-6 rounded-xl shadow-lg fade-up"><h3 class="text-base sm:text-xl font-bold mb-3 text-sky-400 flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg> Intuitive Signature Builder</h3><p class="text-sm text-gray-200">Our user-friendly builder provides a real-time preview as you craft the perfect signature, making the design process a breeze.</p></div>
+
+          <div class="glass-card p-5 sm:p-6 rounded-xl shadow-lg fade-up"><h3 class="text-base sm:text-xl font-bold mb-3 text-sky-400 flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg> Deep Customization</h3><p class="text-sm text-gray-200">Control every detail, from brand colors and fonts to logos, social icons, and custom call-to-action buttons.</p></div>
+
+          <div class="glass-card p-5 sm:p-6 rounded-xl shadow-lg fade-up"><h3 class="text-base sm:text-xl font-bold mb-3 text-sky-400 flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0l5-5 5 5m-10 0v2m10-2v2" /></svg> Multiple Signature Management</h3><p class="text-sm text-gray-200">Easily create, manage, and switch between multiple signatures for different roles or campaigns from a single dashboard.</p></div>
+
+          <div class="glass-card p-5 sm:p-6 rounded-xl shadow-lg fade-up"><h3 class="text-base sm:text-xl font-bold mb-3 text-sky-400 flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg> One-Click Copy & Paste</h3><p class="text-sm text-gray-200">Our secure copy process ensures your signature pastes perfectly into any email client, avoiding broken formatting issues.</p></div>
+
+          <div class="glass-card p-5 sm:p-6 rounded-xl shadow-lg fade-up"><h3 class="text-base sm:text-xl font-bold mb-3 text-sky-400 flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg> Guaranteed Compatibility</h3><p class="text-sm text-gray-200">Signatures are built to be compatible and responsive, ensuring they look perfect in Gmail, Outlook, Apple Mail, and more.</p></div>
+
+          <div class="glass-card p-5 sm:p-6 rounded-xl shadow-lg fade-up"><h3 class="text-base sm:text-xl font-bold mb-3 text-sky-400 flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/></svg> Mini-Game Challenges</h3><p class="text-sm text-gray-200">Test your mental acuity with fun, built-in games inside the app. Compete with others and win credits and rewards!</p></div>
+
+          <div class="glass-card p-5 sm:p-6 rounded-xl shadow-lg fade-up"><h3 class="text-base sm:text-xl font-bold mb-3 text-sky-400 flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg> AI Supported Customization</h3><p class="text-sm text-gray-200">Go beyond standard templates with help from our GPT design assistant. Want a different font or a glowing effect on your photo? Just ask. Our GPT is context-aware to help design signatures that perfectly match your brand.</p></div>
+
+        </div>
+
+      </section>
+
+
+
+      <section id="viewer-experience" class="anchor-offset mt-36 lg:mt-48">
+
+        <h2 class="text-2xl sm:text-4xl font-bold text-center mb-8 sm:mb-12 text-shadow fade-up">2. Easily Engage Your Audience</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 animate-stagger">
+
+          <div class="glass-card-pro p-5 sm:p-6 rounded-xl shadow-lg fade-up"><h3 class="text-base sm:text-xl font-bold mb-3 text-indigo-300 flex items-center gap-3"><svg class="h-6 w-6 text-green-400" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="4"><animate attributeName="r" from="4" to="8" dur="1.5s" begin="0s" repeatCount="indefinite" /><animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0s" repeatCount="indefinite" /></circle><circle cx="12" cy="12" r="4" /></svg> Live Profile Sync</h3><p class="text-sm text-gray-200">Email signatures include a '🟢 Live' icon, linking recipients to your card for the latest info and interactive features.</p></div>
+
+          <div class="glass-card-pro p-5 sm:p-6 rounded-xl shadow-lg fade-up"><h3 class="text-base sm:text-xl font-bold mb-3 text-indigo-300 flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg> No Branding But Yours</h3><p class="text-sm text-gray-200">Your signature is yours alone. We never add our own branding or "Sent with" links to your final signature card.</p></div>
+
+          <div class="glass-card-pro p-5 sm:p-6 rounded-xl shadow-lg fade-up"><h3 class="text-base sm:text-xl font-bold mb-3 text-indigo-300 flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg> Viewer Engagement Stats<sup class="text-indigo-400">*</sup></h3><p class="text-sm text-gray-200">Unlock statistics to see how your audience interacts with your card, including views, clicks, and social shares.</p></div>
+
+          <div class="glass-card-pro p-5 sm:p-6 rounded-xl shadow-lg fade-up"><h3 class="text-base sm:text-xl font-bold mb-3 text-indigo-300 flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2V6a2 2 0 012-2h2.586a1 1 0 01.707.293l1.414 1.414a1 1 0 00.707.293H17z" /></svg> Interactive Polls<sup class="text-indigo-400">*</sup></h3><p class="text-sm text-gray-200">Boost engagement with survey polls and organic sharing with QR+Social Share menus.</p></div>
+
+          <div class="glass-card-pro p-5 sm:p-6 rounded-xl shadow-lg fade-up"><h3 class="text-base sm:text-xl font-bold mb-3 text-indigo-300 flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367 2.684z" /></svg> Easy Social Sharing<sup class="text-indigo-400">*</sup></h3><p class="text-sm text-gray-200">Your public signature page includes a share menu, making it simple for viewers to share your card across their networks.</p></div>
+
+          <div class="glass-card-pro p-5 sm:p-6 rounded-xl shadow-lg fade-up"><h3 class="text-base sm:text-xl font-bold mb-3 text-indigo-300 flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg> Google Maps Locator<sup class="text-indigo-400">*</sup></h3><p class="text-sm text-gray-200">Add a map to your signature card, allowing viewers to easily find your business or event location.</p></div>
+
+        </div>
+
+      </section>
+
+
+
+      <section id="linkup-flagship" class="anchor-offset mt-36 lg:mt-48 text-center">
+
+        <h2 class="text-2xl sm:text-4xl font-bold text-center mb-4 text-shadow fade-up">3. Easily Automate Smarter LinkUps</h2>
+
+        <p class="text-center max-w-3xl mx-auto mt-4 mb-12 text-sm sm:text-lg text-blue-100 fade-up" style="transition-delay: 0.1s;">
+
+          With AI built in, assessing shared interests & mutual fit for smarter, more aligned connections has never been easier!
+
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto animate-stagger">
+
+            <div class="glass-card-pro p-5 sm:p-6 rounded-xl shadow-lg text-left fade-up"><h3 class="text-base sm:text-xl font-bold mb-3 text-indigo-300 flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>Action Items</h3><p class="text-sm text-gray-200">Select the types of offers or action requests that your card viewers can pick in their LinkUp requests, or create your own.</p></div>
+
+            <div class="glass-card-pro p-5 sm:p-6 rounded-xl shadow-lg text-left fade-up"><h3 class="text-base sm:text-xl font-bold mb-3 text-indigo-300 flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>Set Your Availability</h3><p class="text-sm text-gray-200">Not around for a week or two? Set your status to Unavailable with optional return date.</p></div>
+
+            <div class="glass-card-pro p-5 sm:p-6 rounded-xl shadow-lg text-left fade-up"><h3 class="text-base sm:text-xl font-bold mb-3 text-indigo-300 flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>Add Focus Phrases</h3><p class="text-sm text-gray-200">Feel free to prioritize certain industries, roles, professions, or activities that our AI can have on its radar.</p></div>
+
+            <div class="glass-card-pro p-5 sm:p-6 rounded-xl shadow-lg text-left fade-up"><h3 class="text-base sm:text-xl font-bold mb-3 text-indigo-300 flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>Pre-Assessed Recommendations</h3><p class="text-sm text-gray-200">Anyone viewing your card can request a LinkUp but only after a quick intake. Viewers immediately get a recommendation to Pass or Proceed.</p></div>
+
+        </div>
+
+        <div class="mt-12 fade-up" style="transition-delay: 0.2s;">
+
+            <button id="toggle-demo-btn" class="cta-button bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-8 rounded-lg text-base sm:text-lg">
+
+                See LinkUp Demo
+
+            </button>
+
+            <iframe id="linkup-demo-iframe" src="https://socialeap.github.io/hello-linkup/" class="w-full h-[820px] mt-6 rounded-xl border border-indigo-400/20 no-scrollbar-iframe" style="display: none;"></iframe>
+
+        </div>
+
+      </section>
+
+
+
+      <section id="optimization" class="anchor-offset mt-36 lg:mt-48 max-w-6xl mx-auto">
+
+        <h2 class="text-2xl sm:text-4xl font-bold text-center text-shadow fade-up"><span class="block">Built for Discovery</span> <span class="block text-sky-300">AI & SEO Optimized</span></h2>
+
+        <p class="text-center max-w-3xl mx-auto mt-4 mb-8 sm:mb-12 text-sm sm:text-lg text-blue-100 fade-up" style="transition-delay: 0.1s;">In today's digital world, just having a profile isn't enough. Your Hello! Signature Card is engineered to be found. We use advanced techniques to ensure search engines and AI models can easily discover and understand your professional expertise, putting you in front of the right audience.</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 animate-stagger">
+
+          <div class="glass-card p-5 sm:p-6 rounded-xl shadow-lg fade-up"><h3 class="text-base sm:text-xl font-bold mb-3 text-sky-400 flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg> For Search Engines (SEO)</h3><ul class="space-y-2 text-sm text-gray-200"><li class="flex items-start"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>Unique URLs for every signature card</span></li><li class="flex items-start"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>Dynamic meta titles & rich descriptions</span></li><li class="flex items-start"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>Enhanced JSON-LD Person schema</span></li></ul></div>
+
+          <div class="glass-card p-5 sm:p-6 rounded-xl shadow-lg fade-up"><h3 class="text-base sm:text-xl font-bold mb-3 text-sky-400 flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg> For AI Models</h3><ul class="space-y-2 text-sm text-gray-200"><li class="flex items-start"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>AI-friendly FAQ schemas</span></li><li class="flex items-start"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>Structured Q&amp;A for direct answers</span></li><li class="flex items-start"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>Semantic HTML for better understanding</span></li></ul></div>
+
+        </div>
+
+      </section>
+
+
+
+      <section id="use-cases" class="anchor-offset mt-36 lg:mt-48">
+
+        <h2 class="text-2xl sm:text-4xl font-bold text-center mb-4 text-shadow fade-up">One Signature, Countless Applications</h2>
+
+        <div class="max-w-5xl mx-auto my-8 sm:my-12"><div class="colored-panel p-6 sm:p-8 md:p-12 rounded-2xl shadow-2xl fade-up"><div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center"><div class="text-center lg:text-left"><h2 class="text-2xl sm:text-4xl font-bold mb-4 text-shadow">Designed to be Shared</h2><p class="text-sm sm:text-lg text-blue-100">Your Hello! Signature Card isn't just a compact presentation of your professional profile. It's designed for posting and embedding into a variety of social media, document formats, and messaging apps. Each Signature page can be optimized with a Share Menu that lets viewers share your card with their own social networks.</p></div><div class="flex justify-center"><img src="https://static.wixstatic.com/media/c3283f_4e87e2632190447fb5eb7d608c0783cf~mv2.png" alt="Example of a shareable Hello signature card" class="rounded-lg shadow-lg mx-auto" style="max-width: 400px; width: 100%;"></div></div></div></div>
+
+        <div class="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 text-center">
+
+          <div class="colored-panel p-4 rounded-lg flex items-center justify-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg><p class="text-sm">Email Clients</p></div>
+
+          <div class="colored-panel p-4 rounded-lg flex items-center justify-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg><p class="text-sm">LinkedIn Profiles</p></div>
+
+          <div class="colored-panel p-4 rounded-lg flex items-center justify-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3h9M7 16h6M7 8h6v4H7V8z" /></svg><p class="text-sm">Blog Post Bios</p></div>
+
+          <div class="colored-panel p-4 rounded-lg flex items-center justify-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg><p class="text-sm">CRM Templates</p></div>
+
+          <div class="colored-panel p-4 rounded-lg flex items-center justify-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg><p class="text-sm">Forum Signatures</p></div>
+
+          <div class="colored-panel p-4 rounded-lg flex items-center justify-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" /></svg><p class="text-sm">Helpdesk Replies</p></div>
+
+          <div class="colored-panel p-4 rounded-lg flex items-center justify-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg><p class="text-sm">Digital Resumes</p></div>
+
+          <div class="colored-panel p-4 rounded-lg flex items-center justify-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg><p class="text-sm">Link-in-Bio Pages</p></div>
+
+        </div>
+
+      </section>
+
+
+
+      <section id="pricing" class="anchor-offset mt-36 lg:mt-48 max-w-7xl mx-auto">
+
+        <h2 class="text-2xl sm:text-4xl font-bold text-center mb-8 sm:mb-12 text-shadow fade-up">Start Here... and Get your Brand Anywhere</h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch animate-stagger">
+
+          <div class="pricing-card p-6 sm:p-8 rounded-2xl shadow-2xl text-center border-2 border-sky-500 h-full flex flex-col fade-up"><h3 class="text-xl sm:text-3xl font-bold text-sky-400">Design your Card</h3><div class="my-8 flex-grow"><p class="text-3xl sm:text-5xl font-extrabold text-sky-300">$0.00</p><p class="text-gray-200 font-bold">Free, Forever</p></div><ul class="text-left space-y-2 sm:space-y-3 mb-6 sm:mb-8 text-sm text-gray-200"><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Easy-to-use Builder & Dashboard</li><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Profile & Background Image</li><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Custom Button Links</li><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Social Media Icons</li><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>.vCard Download</li></ul><div class="mt-auto"><button class="js-open-modal cta-button block w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 px-6 rounded-lg text-sm sm:text-lg">Join the Waiting List</button></div></div>
+
+          <div class="pricing-card p-6 sm:p-8 rounded-2xl shadow-2xl text-center border-2 border-sky-500 h-full flex flex-col fade-up"><h3 class="text-xl sm:text-3xl font-bold text-sky-400">Publisher Pack</h3><div class="my-8 flex-grow"><p class="text-3xl sm:text-5xl font-extrabold text-sky-300">$4.99</p><p class="text-gray-200 font-bold">One-Time Payment</p></div><ul class="text-left space-y-2 sm:space-y-3 mb-6 sm:mb-8 text-sm text-gray-200"><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>3 Publishing Slots</li><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Embeds for a Variety of Content</li><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Shareable Links to Card Pages</li><li class="flex items-center"><svg class="w-5 h-5 text-sky-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Earn Credits via Referrals & Game Challenges</li></ul><div class="mt-auto"><button class="js-open-modal cta-button block w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 px-6 rounded-lg text-sm sm:text-lg">Join the Waiting List</button></div></div>
+
+          <div class="pricing-card p-6 sm:p-8 rounded-2xl shadow-2xl text-center border-2 border-indigo-500 h-full flex flex-col relative fade-up"><div class="absolute top-0 right-4 -mt-4"><span class="bg-indigo-500 text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg">PRO</span></div><h3 class="text-xl sm:text-3xl font-bold text-indigo-400">Pro Plan</h3><div class="my-8 flex-grow"><p class="text-3xl sm:text-5xl font-extrabold text-indigo-300">$3.99<span class="text-xl font-medium text-gray-300">/mo</span></p><p class="text-gray-200 font-bold">Save 23% at $36.99/yr</p></div><ul class="text-left space-y-2 sm:space-y-3 mb-6 sm:mb-8 text-sm text-gray-200"><li class="flex items-center"><svg class="w-5 h-5 text-indigo-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>AI Enhanced LinkUp</li><li class="flex items-center"><svg class="w-5 h-5 text-indigo-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Views & Activity Stats</li><li class="flex items-center"><svg class="w-5 h-5 text-indigo-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Social Share Menu</li><li class="flex items-center"><svg class="w-5 h-5 text-indigo-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Add a Social Poll</li><li class="flex items-center"><svg class="w-5 h-5 text-indigo-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>Google Maps Locator</li></ul><p class="text-xs text-gray-400 mt-2 text-center">* Publisher Pack purchase required.</p><div class="mt-auto pt-4"><button class="js-open-modal cta-button block w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-6 rounded-lg text-sm sm:text-lg">Join the Waiting List</button></div></div>
+
+        </div>
+
+      </section>
+
+
+
+      <footer class="text-center mt-24">
+
+        <p class="text-sm text-gray-400">* Indicates a Pro Plan feature.</p>
+
+      </footer>
+
+
+
+      <section id="roadmap" class="anchor-offset mt-36 lg:mt-48 max-w-7xl mx-auto">
+
+        <h2 class="text-2xl sm:text-4xl font-bold text-center mb-2 text-shadow fade-up">Hello! Road Map</h2>
+
+        <p class="text-center text-blue-100 mb-10 fade-up" style="transition-delay: 0.1s;">What’s shipping next — and when. Click a card to learn more.</p>
+
+        <div class="timeline-container">
+
+            <div class="timeline-item left"><div class="flip-card-container slide-in-left" tabindex="0" role="button"><div class="flipper"><div class="card-front glass-card p-4 flex items-center gap-4 cursor-pointer"><div class="flex-shrink-0 text-center bg-indigo-900/50 rounded-lg p-3 w-24"><span class="text-green-300 font-bold text-2xl">MAR</span><span class="block text-green-300/80 text-sm font-semibold">'25</span></div><h3 class="font-semibold text-green-200 text-lg">Basic Email Signature Builder</h3></div><div class="card-back colored-panel p-4 flex flex-col justify-center text-left"><div class="p-4"><h3 class="text-lg font-bold text-green-300">Basic Email Signature Builder</h3><p class="text-sm text-blue-100 mt-2">Craft clean, compatible signatures for Gmail and Outlook. Copy-paste ready with live preview.</p><span class="inline-block mt-3 text-xs px-2 py-1 rounded bg-sky-400/20 text-sky-200 border border-sky-400/30 self-start">Target: 03/2025</span></div></div></div></div></div>
+
+            <div class="timeline-item right"><div class="flip-card-container slide-in-right" tabindex="0" role="button"><div class="flipper"><div class="card-front glass-card p-4 flex items-center gap-4 cursor-pointer"><div class="flex-shrink-0 text-center bg-indigo-900/50 rounded-lg p-3 w-24"><span class="text-green-300 font-bold text-2xl">MAY</span><span class="block text-green-300/80 text-sm font-semibold">'25</span></div><h3 class="font-semibold text-green-200 text-lg">Dynamic Signature Builder</h3></div><div class="card-back colored-panel p-4 flex flex-col justify-center text-left"><div class="p-4"><h3 class="text-lg font-bold text-green-300">Dynamic Signature Builder</h3><p class="text-sm text-blue-100 mt-2">Publish a live, shareable signature page with public viewing links.</p><span class="inline-block mt-3 text-xs px-2 py-1 rounded bg-sky-400/20 text-sky-200 border border-sky-400/30 self-start">Target: 05/2025</span></div></div></div></div></div>
+
+            <div class="timeline-item left"><div class="flip-card-container slide-in-left" tabindex="0" role="button"><div class="flipper"><div class="card-front glass-card p-4 flex items-center gap-4 cursor-pointer"><div class="flex-shrink-0 text-center bg-indigo-900/50 rounded-lg p-3 w-24"><span class="text-green-300 font-bold text-2xl">JUL</span><span class="block text-green-300/80 text-sm font-semibold">'25</span></div><h3 class="font-semibold text-green-200 text-lg">Engagement Features</h3></div><div class="card-back colored-panel p-4 flex flex-col justify-center text-left"><div class="p-4"><h3 class="text-lg font-bold text-green-300">Engagement Features</h3><p class="text-sm text-blue-100 mt-2">Boost engagement with survey polls and organic sharing with QR+Social Share menus.</p><span class="inline-block mt-3 text-xs px-2 py-1 rounded bg-sky-400/20 text-sky-200 border border-sky-400/30 self-start">Target: 07/2025</span></div></div></div></div></div>
+
+            <div class="timeline-item right"><div class="flip-card-container slide-in-right" tabindex="0" role="button"><div class="flipper"><div class="card-front glass-card p-4 flex items-center gap-4 cursor-pointer"><div class="flex-shrink-0 text-center bg-indigo-900/50 rounded-lg p-3 w-24"><span class="text-green-300 font-bold text-2xl">SEP</span><span class="block text-green-300/80 text-sm font-semibold">'25</span></div><h3 class="font-semibold text-green-200 text-lg">Introduced Hello! LinkUp</h3></div><div class="card-back colored-panel p-4 flex flex-col justify-center text-left"><div class="p-4"><h3 class="text-lg font-bold text-green-300">Introduced Hello! LinkUp</h3><p class="text-sm text-blue-100 mt-2">Finally! A smart system to assess, filter, and recommend social connections for better alignment with your focus & interests.</p><span class="inline-block mt-3 text-xs px-2 py-1 rounded bg-sky-400/20 text-sky-200 border border-sky-400/30 self-start">Target: 09/2025</span></div></div></div></div></div>
+
+            <div class="timeline-item left"><div class="flip-card-container slide-in-left" tabindex="0" role="button"><div class="flipper"><div class="card-front glass-card p-4 flex items-center gap-4 cursor-pointer"><div class="flex-shrink-0 text-center bg-indigo-900/50 rounded-lg p-3 w-24"><span class="text-green-300 font-bold text-2xl">OCT</span><span class="block text-green-300/80 text-sm font-semibold">'25</span></div><h3 class="font-semibold text-green-200 text-lg">Public Launch Point</h3></div><div class="card-back colored-panel p-4 flex flex-col justify-center text-left"><div class="p-4"><h3 class="text-lg font-bold text-green-300">Public Launch Point</h3><p class="text-sm text-blue-100 mt-2">Earmarked mid October to open Hello! to the public as a new, smarter networking & social marketing tool.</p><span class="inline-block mt-3 text-xs px-2 py-1 rounded bg-sky-400/20 text-sky-200 border border-sky-400/30 self-start">Target: 10/2025</span></div></div></div></div></div>
+
+            <div class="timeline-item right"><div class="flip-card-container slide-in-right" tabindex="0" role="button"><div class="flipper"><div class="card-front glass-card p-4 flex items-center gap-4 cursor-pointer"><div class="flex-shrink-0 text-center bg-indigo-900/50 rounded-lg p-3 w-24"><span class="text-green-300 font-bold text-2xl">NOV</span><span class="block text-green-300/80 text-sm font-semibold">'25</span></div><h3 class="font-semibold text-green-200 text-lg">Signature Spotlights</h3></div><div class="card-back colored-panel p-4 flex flex-col justify-center text-left"><div class="p-4"><h3 class="text-lg font-bold text-green-300">Signature Spotlights</h3><p class="text-sm text-blue-100 mt-2">Curated gallery highlighting standout Signature Cards from the community.</p><span class="inline-block mt-3 text-xs px-2 py-1 rounded bg-sky-400/20 text-sky-200 border border-sky-400/30 self-start">Target: 11/2025</span></div></div></div></div></div>
+
+            <div class="timeline-item left"><div class="flip-card-container slide-in-left" tabindex="0" role="button"><div class="flipper"><div class="card-front glass-card p-4 flex items-center gap-4 cursor-pointer"><div class="flex-shrink-0 text-center bg-indigo-900/50 rounded-lg p-3 w-24"><span class="text-green-300 font-bold text-2xl">FEB</span><span class="block text-green-300/80 text-sm font-semibold">'26</span></div><h3 class="font-semibold text-green-200 text-lg">Hello! Teams</h3></div><div class="card-back colored-panel p-4 flex flex-col justify-center text-left"><div class="p-4"><h3 class="text-lg font-bold text-green-300">Hello! Teams</h3><p class="text-sm text-blue-100 mt-2">Centralized admin dashboard for companies to manage employee signatures, enforce brand consistency, and streamline distribution.</p><span class="inline-block mt-3 text-xs px-2 py-1 rounded bg-sky-400/20 text-sky-200 border border-sky-400/30 self-start">Target: 02/2026</span></div></div></div></div></div>
+
+            <div class="timeline-item right"><div class="flip-card-container slide-in-right" tabindex="0" role="button"><div class="flipper"><div class="card-front glass-card p-4 flex items-center gap-4 cursor-pointer"><div class="flex-shrink-0 text-center bg-indigo-900/50 rounded-lg p-3 w-24"><span class="text-green-300 font-bold text-2xl">MAR</span><span class="block text-green-300/80 text-sm font-semibold">'26</span></div><h3 class="font-semibold text-green-200 text-lg">Directory Platform</h3></div><div class="card-back colored-panel p-4 flex flex-col justify-center text-left"><div class="p-4"><h3 class="text-lg font-bold text-green-300">Directory Platform</h3><p class="text-sm text-blue-100 mt-2">Discover people by tags and expertise in a searchable network of Cards.</p><span class="inline-block mt-3 text-xs px-2 py-1 rounded bg-sky-400/20 text-sky-200 border border-sky-400/30 self-start">Target: 03/2026</span></div></div></div></div></div>
+
+        </div>
+
+      </section>
+
+
+
+    </div>
+
+  </main>
+
+
+
+  <div id="jotform-overlay" aria-hidden="true">
+
+    <div id="jotform-panel" class="modal-panel no-scrollbar p-6 sm:p-8">
+
+      <button id="close-modal-btn" class="absolute top-3 right-3 text-gray-300 hover:text-white transition-colors" aria-label="Close"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></button>
+
+      <div class="flex-shrink-0 text-center">
+
+        <h3 class="text-2xl font-bold text-sky-300 mb-2">Get Early Access!</h3>
+
+        <p class="text-blue-100/90 text-sm max-w-xl mx-auto">Sign up for our waiting list for a chance to get a <strong>free signature credit</strong>, or join as an early <strong>Beta Adopter</strong> to help us test the app. Beta Adopters receive a free signature plus a <strong>30-day spotlight</strong> for their card right here on our landing page!</p>
+
+      </div>
+
+      <div class="mt-6 rounded-lg overflow-hidden border border-white/20 frame-wrap">
+
+        <iframe id="jotform-iframe" class="w-full" style="height: 860px;" src="https://form.jotform.com/251506550306045" frameborder="0" title="Beta Adopter and Waiting List Form" allowtransparency="true"></iframe>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <button id="back-to-top" title="Go to top">
+
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+
+      <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
+
+    </svg>
+
+  </button>
+
+
+
+  <script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+      // ---------- Zig-Zag Flip Card Logic ----------
+
+      const flipCards = document.querySelectorAll('.flip-card-container');
+
+      flipCards.forEach(card => {
+
+        const flipAction = () => {
+
+          if (card.classList.contains('is-flipped')) {
+
+            card.classList.remove('is-flipped');
+
+          } else {
+
+            flipCards.forEach(otherCard => {
+
+              otherCard.classList.remove('is-flipped');
+
+            });
+
+            card.classList.add('is-flipped');
+
+          }
+
+        };
+
+        card.addEventListener('click', flipAction);
+
+        card.addEventListener('keydown', (e) => {
+
+          if (e.key === 'Enter' || e.key === ' ') {
+
+              e.preventDefault();
+
+              flipAction();
+
+          }
+
+        });
+
+      });
+
+
+
+      // ---------- Jotform Modal Logic ----------
+
+      const overlay = document.getElementById('jotform-overlay');
+
+      const panel   = document.getElementById('jotform-panel');
+
+      const iframe  = document.getElementById('jotform-iframe');
+
+      const closeBtn = document.getElementById('close-modal-btn');
+
+      const openBtns = document.querySelectorAll('.js-open-modal');
+
+      let lastTriggerRect = null;
+
+      function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+      function positionPanel() {
+
+        if (!lastTriggerRect) {
+
+          const topCentered = (window.innerHeight - panel.offsetHeight) / 2;
+
+          panel.style.top = clamp(topCentered, 16, window.innerHeight - 16 - Math.min(panel.offsetHeight, window.innerHeight - 32)) + window.scrollY + 'px';
+
+          return;
+
+        }
+
+        const margin = 16;
+
+        const preferredTop = lastTriggerRect.top + window.scrollY + 8;
+
+        const maxTop = window.scrollY + window.innerHeight - margin - Math.min(panel.offsetHeight, window.innerHeight - margin*2);
+
+        const minTop = window.scrollY + margin;
+
+        const finalTop = clamp(preferredTop, minTop, maxTop);
+
+        panel.style.top = finalTop + 'px';
+
+      }
+
+      function openModal(trigger) {
+
+        lastTriggerRect = trigger.getBoundingClientRect();
+
+        overlay.style.display = 'block';
+
+        document.body.style.overflow = 'hidden';
+
+        panel.style.width = Math.min(880, window.innerWidth * 0.94) + 'px';
+
+        requestAnimationFrame(() => {
+
+          positionPanel();
+
+          const panelRect = panel.getBoundingClientRect();
+
+          if (panelRect.bottom > window.innerHeight - 8) {
+
+            overlay.scrollTop += (panelRect.bottom - window.innerHeight + 8);
+
+          }
+
+          if (panelRect.top < 8) {
+
+            overlay.scrollTop += (panelRect.top - 8);
+
+          }
+
+        });
+
+      }
+
+      function closeModal() {
+
+        overlay.style.display = 'none';
+
+        document.body.style.overflow = '';
+
+      }
+
+      openBtns.forEach(btn => btn.addEventListener('click', () => openModal(btn)));
+
+      closeBtn.addEventListener('click', closeModal);
+
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && overlay.style.display === 'block') closeModal(); });
+
+      window.addEventListener('resize', () => { if (overlay.style.display === 'block') { panel.style.width = Math.min(880, window.innerWidth * 0.94) + 'px'; positionPanel(); } });
+
+      window.addEventListener('message', function(e) {
+
+        try {
+
+          const allowed = /jotform\.com$/i.test(new URL(e.origin).hostname);
+
+          if (!allowed) return;
+
+          let newHeight = null;
+
+          if (typeof e.data === 'string') {
+
+            if (e.data.indexOf('setHeight') > -1) {
+
+              const parts = e.data.split(':');
+
+              if (parts[1]) newHeight = parseInt(parts[1].replace(/[^\d]/g,''), 10);
+
+            } else {
+
+              try {
+
+                const obj = JSON.parse(e.data);
+
+                if (obj && (obj.height || obj.newHeight)) newHeight = parseInt(obj.height || obj.newHeight, 10);
+
+              } catch(_) {}
+
+            }
+
+          } else if (typeof e.data === 'object' && e.data) {
+
+            if (e.data.height || e.data.newHeight) newHeight = parseInt(e.data.height || e.data.newHeight, 10);
+
+          }
+
+          if (newHeight && Number.isFinite(newHeight)) {
+
+            iframe.style.height = newHeight + 'px';
+
+            requestAnimationFrame(positionPanel);
+
+          }
+
+        } catch(_) {}
+
+      }, false);
+
+
+
+      // ---------- Anchor Link Scrolling Fix for iFrames ----------
+
+      document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
+
+        anchor.addEventListener('click', function (e) {
+
+          e.preventDefault();
+
+          const targetId = this.getAttribute('href');
+
+          const targetElement = document.querySelector(targetId);
+
+          if (targetElement) {
+
+            targetElement.scrollIntoView({
+
+              behavior: 'smooth',
+
+              block: 'start' 
+
+            });
+
+          }
+
+        });
+
+      });
+
+      
+
+      // --- LIVE DEMO IFRAME TOGGLE ---
+
+      const demoBtn = document.getElementById('toggle-demo-btn');
+
+      const demoIframe = document.getElementById('linkup-demo-iframe');
+
+      if (demoBtn && demoIframe) {
+
+          demoBtn.addEventListener('click', () => {
+
+              const isHidden = demoIframe.style.display === 'none';
+
+              demoIframe.style.display = isHidden ? 'block' : 'none';
+
+          });
+
+      }
+
+
+
+      // --- BACK-TO-TOP BUTTON LOGIC ---
+
+      const backToTopButton = document.getElementById('back-to-top');
+
+      backToTopButton.addEventListener('click', () => {
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      });
+
+      
+
+      // --- SCROLL ANIMATION LOGIC ---
+
+      const animationObserver = new IntersectionObserver((entries, observer) => {
+
+        entries.forEach(entry => {
+
+          if (entry.isIntersecting) {
+
+            entry.target.classList.add('is-visible');
+
+            observer.unobserve(entry.target);
+
+          }
+
+        });
+
+      }, { threshold: 0.1 });
+
+
+
+      // Animate individual elements that aren't in a staggered grid
+
+      document.querySelectorAll('.fade-up:not(.animate-stagger .fade-up), .slide-in-left, .slide-in-right').forEach(el => {
+
+        animationObserver.observe(el);
+
+      });
+
+      
+
+      // Animate staggered grid elements
+
+      document.querySelectorAll('.animate-stagger').forEach(grid => {
+
+        const children = grid.querySelectorAll('.fade-up');
+
+        children.forEach((child, index) => {
+
+            child.style.transitionDelay = `${index * 0.1}s`;
+
+            animationObserver.observe(child);
+
+        });
+
+      });
+
+
+
+    });
+
+  </script>
+
+
+
 </body>
+
 </html>
+
+
+
